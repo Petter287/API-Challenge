@@ -9,6 +9,8 @@ class Estudiante_model extends Base_model
 
     protected $allowedFields = [
         'nombre',
-        'apellido'
+        'apellido',
+        'dni',
+        'fechaNacimiento'
     ];
 }

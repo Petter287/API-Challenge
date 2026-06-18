@@ -54,6 +54,8 @@
                                     <th style="width: 80px;">ID</th>
                                     <th>Nombre</th>
                                     <th>Apellido</th>
+                                    <th>DNI</th>
+                                    <th>Fecha nacimiento</th>
                                     <th>Creado por</th>
                                     <th>Fecha creación</th>
                                     <th style="width: 140px;">Acciones</th>
@@ -65,6 +67,13 @@
                                         <td><?= esc($estudiante['id']) ?></td>
                                         <td><?= esc($estudiante['nombre']) ?></td>
                                         <td><?= esc($estudiante['apellido']) ?></td>
+                                        <td><?= esc($estudiante['dni']) ?></td>
+                                        <td>
+                                            <?= !empty($estudiante['fechaNacimiento'])
+                                                ? date('d/m/Y', strtotime($estudiante['fechaNacimiento']))
+                                                : '-'
+                                            ?>
+                                        </td>
                                         <td><?= esc($estudiante['createdBy'] ?? '-') ?></td>
                                         <td>
                                             <?= !empty($estudiante['createdAt'])
@@ -79,7 +88,9 @@
                                                 title="Editar"
                                                 data-id="<?= esc($estudiante['id']) ?>"
                                                 data-nombre="<?= esc($estudiante['nombre']) ?>"
-                                                data-apellido="<?= esc($estudiante['apellido']) ?>">
+                                                data-apellido="<?= esc($estudiante['apellido']) ?>"
+                                                data-dni="<?= esc($estudiante['dni']) ?>"
+                                                data-fecha-nacimiento="<?= esc($estudiante['fechaNacimiento']) ?>">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
 
@@ -89,7 +100,9 @@
                                                 title="Eliminar"
                                                 data-id="<?= esc($estudiante['id']) ?>"
                                                 data-nombre="<?= esc($estudiante['nombre']) ?>"
-                                                data-apellido="<?= esc($estudiante['apellido']) ?>">
+                                                data-apellido="<?= esc($estudiante['apellido']) ?>"
+                                                data-dni="<?= esc($estudiante['dni']) ?>"
+                                                data-fecha-nacimiento="<?= esc($estudiante['fechaNacimiento']) ?>">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -176,6 +189,27 @@
                                 required>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="dni" class="form-label">DNI</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="dni"
+                                name="dni"
+                                maxlength="20"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="fechaNacimiento"
+                                name="fechaNacimiento"
+                                required>
+                        </div>
+
                     </div>
 
                     <div class="modal-footer">
@@ -242,7 +276,9 @@
             prepararModalEditar({
                 id: botonEditar.dataset.id,
                 nombre: botonEditar.dataset.nombre,
-                apellido: botonEditar.dataset.apellido
+                apellido: botonEditar.dataset.apellido,
+                dni: botonEditar.dataset.dni,
+                fechaNacimiento: botonEditar.dataset.fechaNacimiento
             });
         });
 
@@ -256,7 +292,9 @@
             prepararModalEliminar({
                 id: botonEliminar.dataset.id,
                 nombre: botonEliminar.dataset.nombre,
-                apellido: botonEliminar.dataset.apellido
+                apellido: botonEliminar.dataset.apellido,
+                dni: botonEliminar.dataset.dni,
+                fechaNacimiento: botonEliminar.dataset.fechaNacimiento
             });
         });
 
@@ -266,9 +304,11 @@
             const idEstudiante = document.getElementById('idEstudiante').value;
             const nombre = document.getElementById('nombre').value.trim();
             const apellido = document.getElementById('apellido').value.trim();
+            const dni = document.getElementById('dni').value.trim();
+            const fechaNacimiento = document.getElementById('fechaNacimiento').value;
 
-            if (!nombre || !apellido) {
-                mostrarToast('El nombre y el apellido son obligatorios.', 'error');
+            if (!nombre || !apellido || !dni || !fechaNacimiento) {
+                mostrarToast('El nombre, el apellido, el DNI y la fecha de nacimiento son obligatorios.', 'error');
                 return;
             }
 
@@ -289,7 +329,9 @@
                     },
                     body: JSON.stringify({
                         nombre: nombre,
-                        apellido: apellido
+                        apellido: apellido,
+                        dni: dni,
+                        fechaNacimiento: fechaNacimiento
                     })
                 });
 
@@ -385,6 +427,8 @@
             document.getElementById('idEstudiante').value = estudiante.id;
             document.getElementById('nombre').value = estudiante.nombre;
             document.getElementById('apellido').value = estudiante.apellido;
+            document.getElementById('dni').value = estudiante.dni;
+            document.getElementById('fechaNacimiento').value = estudiante.fechaNacimiento;
             modalCrearEstudianteLabel.innerText = 'Editar estudiante';
             btnGuardarEstudiante.innerText = 'Actualizar';
             modalCrearEstudiante.show();
@@ -416,6 +460,8 @@
                                     <th style="width: 80px;">ID</th>
                                     <th>Nombre</th>
                                     <th>Apellido</th>
+                                    <th>DNI</th>
+                                    <th>Fecha nacimiento</th>
                                     <th>Creado por</th>
                                     <th>Fecha creación</th>
                                     <th style="width: 140px;">Acciones</th>
@@ -484,6 +530,8 @@
                 <td>${escapeHtml(estudiante.id)}</td>
                 <td>${escapeHtml(estudiante.nombre)}</td>
                 <td>${escapeHtml(estudiante.apellido)}</td>
+                <td>${escapeHtml(estudiante.dni)}</td>
+                <td>${formatearFechaNacimiento(estudiante.fechaNacimiento)}</td>
                 <td>${escapeHtml(estudiante.createdBy ?? '-')}</td>
                 <td>${formatearFecha(estudiante.createdAt)}</td>
                 <td>
@@ -493,7 +541,9 @@
                         title="Editar estudiante"
                         data-id="${escapeHtml(estudiante.id)}"
                         data-nombre="${escapeHtml(estudiante.nombre)}"
-                        data-apellido="${escapeHtml(estudiante.apellido)}">
+                        data-apellido="${escapeHtml(estudiante.apellido)}"
+                        data-dni="${escapeHtml(estudiante.dni)}"
+                        data-fecha-nacimiento="${escapeHtml(estudiante.fechaNacimiento)}">
                         <i class="bi bi-pencil-square"></i>
                     </button>
 
@@ -503,7 +553,9 @@
                         title="Eliminar estudiante"
                         data-id="${escapeHtml(estudiante.id)}"
                         data-nombre="${escapeHtml(estudiante.nombre)}"
-                        data-apellido="${escapeHtml(estudiante.apellido)}">
+                        data-apellido="${escapeHtml(estudiante.apellido)}"
+                        data-dni="${escapeHtml(estudiante.dni)}"
+                        data-fecha-nacimiento="${escapeHtml(estudiante.fechaNacimiento)}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -544,6 +596,20 @@
             const minutos = String(date.getMinutes()).padStart(2, '0');
 
             return `${dia}/${mes}/${anio} ${hora}:${minutos}`;
+        }
+
+        function formatearFechaNacimiento(fecha) {
+            if (!fecha) {
+                return '-';
+            }
+
+            const partes = String(fecha).split('-');
+
+            if (partes.length !== 3) {
+                return fecha;
+            }
+
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
         function escapeHtml(value) {

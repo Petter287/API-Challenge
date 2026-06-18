@@ -119,3 +119,8 @@ INSERT INTO Periodo (nombre)
 VALUES  ('anual'),
         ('primer_cuatrimestre'),
         ('segundo_cuatrimestre');
+
+ALTER TABLE Estudiante
+ADD COLUMN dni VARCHAR(20) NOT NULL AFTER apellido,
+ADD COLUMN fechaNacimiento DATE NOT NULL AFTER dni;
+ADD UNIQUE KEY uq_estudiante_dni (dni);

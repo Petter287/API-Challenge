@@ -20,13 +20,25 @@ class Estudiante extends BaseController
 
         $nombre = trim($json['nombre'] ?? '');
         $apellido = trim($json['apellido'] ?? '');
+        $dni = trim($json['dni'] ?? '');
+        $fechaNacimiento = trim($json['fechaNacimiento'] ?? '');
 
-        if ($nombre === '' || $apellido === '') {
+        if ($nombre === '' || $apellido === '' || $dni === '' || $fechaNacimiento === '') {
             return $this->response
                 ->setStatusCode(400)
                 ->setJSON([
                     'success' => false,
-                    'message' => 'El nombre y el apellido son obligatorios.',
+                    'message' => 'El nombre, el apellido, el DNI y la fecha de nacimiento son obligatorios.',
+                    'data' => null
+                ]);
+        }
+
+        if (!$this->isValidDate($fechaNacimiento)) {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'La fecha de nacimiento debe tener el formato YYYY-MM-DD.',
                     'data' => null
                 ]);
         }
@@ -35,7 +47,9 @@ class Estudiante extends BaseController
 
         $result = $library->create([
             'nombre' => $nombre,
-            'apellido' => $apellido
+            'apellido' => $apellido,
+            'dni' => $dni,
+            'fechaNacimiento' => $fechaNacimiento
         ]);
 
         return $this->response
@@ -49,13 +63,25 @@ class Estudiante extends BaseController
 
         $nombre = trim($json['nombre'] ?? '');
         $apellido = trim($json['apellido'] ?? '');
+        $dni = trim($json['dni'] ?? '');
+        $fechaNacimiento = trim($json['fechaNacimiento'] ?? '');
 
-        if ($nombre === '' || $apellido === '') {
+        if ($nombre === '' || $apellido === '' || $dni === '' || $fechaNacimiento === '') {
             return $this->response
                 ->setStatusCode(400)
                 ->setJSON([
                     'success' => false,
-                    'message' => 'El nombre y el apellido son obligatorios.',
+                    'message' => 'El nombre, el apellido, el DNI y la fecha de nacimiento son obligatorios.',
+                    'data' => null
+                ]);
+        }
+
+        if (!$this->isValidDate($fechaNacimiento)) {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'La fecha de nacimiento debe tener el formato YYYY-MM-DD.',
                     'data' => null
                 ]);
         }
@@ -63,7 +89,9 @@ class Estudiante extends BaseController
         $library = new LibraryEstudiante();
         $result = $library->update($id, [
             'nombre' => $nombre,
-            'apellido' => $apellido
+            'apellido' => $apellido,
+            'dni' => $dni,
+            'fechaNacimiento' => $fechaNacimiento
         ]);
 
         return $this->response
@@ -78,5 +106,15 @@ class Estudiante extends BaseController
         return $this->response
             ->setStatusCode($result['success'] ? 200 : 500)
             ->setJSON($result);
+    }
+
+    private function isValidDate(string $date): bool
+    {
+        $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
+        $errors = \DateTime::getLastErrors();
+
+        return $dateTime !== false
+            && $dateTime->format('Y-m-d') === $date
+            && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0));
     }
 }

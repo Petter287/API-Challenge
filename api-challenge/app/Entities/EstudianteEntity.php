@@ -7,4 +7,6 @@ class EstudianteEntity extends BaseEntity
 {
     public string $nombre;
     public string $apellido;
+    public string $dni;
+    public string $fechaNacimiento;
 }

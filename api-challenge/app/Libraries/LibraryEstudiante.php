@@ -3,7 +3,6 @@
 namespace App\Libraries;
 use App\Models\Estudiante_model;
 use App\Entities\EstudianteEntity;
-use DateTime;
 
 class LibraryEstudiante
 {
@@ -19,6 +18,8 @@ class LibraryEstudiante
         $estudiante = new EstudianteEntity();
         $estudiante->nombre = $data['nombre'] ?? null;
         $estudiante->apellido = $data['apellido'] ?? null;
+        $estudiante->dni = $data['dni'] ?? null;
+        $estudiante->fechaNacimiento = $data['fechaNacimiento'] ?? null;
 
         $model = new Estudiante_model();
         $idEstudiante = $model->insert($estudiante, true);
@@ -51,7 +52,9 @@ class LibraryEstudiante
 
         $updated = $model->update($id, [
             'nombre' => $data['nombre'],
-            'apellido' => $data['apellido']
+            'apellido' => $data['apellido'],
+            'dni' => $data['dni'],
+            'fechaNacimiento' => $data['fechaNacimiento']
         ]);
 
         return [
