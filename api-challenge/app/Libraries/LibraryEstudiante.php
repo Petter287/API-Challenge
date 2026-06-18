@@ -35,4 +35,29 @@ class LibraryEstudiante
 
         return $structReturn;
     }
+
+    public function update(int $id, array $data)
+    {
+        $model = new Estudiante_model();
+        $estudianteExistente = $model->find($id);
+
+        if (!$estudianteExistente) {
+            return [
+                'success' => false,
+                'message' => 'Estudiante no encontrado.',
+                'data' => null
+            ];
+        }
+
+        $updated = $model->update($id, [
+            'nombre' => $data['nombre'],
+            'apellido' => $data['apellido']
+        ]);
+
+        return [
+            'success' => $updated,
+            'message' => $updated ? 'Estudiante actualizado exitosamente.' : 'Error al actualizar el estudiante.',
+            'data' => $updated ? $model->find($id) : null
+        ];
+    }
 }

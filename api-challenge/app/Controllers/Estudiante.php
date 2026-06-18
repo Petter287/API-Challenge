@@ -42,4 +42,32 @@ class Estudiante extends BaseController
             ->setStatusCode($result['success'] ? 201 : 500)
             ->setJSON($result);
     }
+
+    public function update(int $id)
+    {
+        $json = $this->request->getJSON(true);
+
+        $nombre = trim($json['nombre'] ?? '');
+        $apellido = trim($json['apellido'] ?? '');
+
+        if ($nombre === '' || $apellido === '') {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'El nombre y el apellido son obligatorios.',
+                    'data' => null
+                ]);
+        }
+
+        $library = new LibraryEstudiante();
+        $result = $library->update($id, [
+            'nombre' => $nombre,
+            'apellido' => $apellido
+        ]);
+
+        return $this->response
+            ->setStatusCode($result['success'] ? 200 : 500)
+            ->setJSON($result);
+    }
 }

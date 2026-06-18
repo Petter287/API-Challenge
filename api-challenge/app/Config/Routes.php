@@ -8,4 +8,5 @@ $routes->get('/', 'Home::index');
 $routes->group('estudiante', function($routes) {
     $routes->get('/', 'Estudiante::index');
     $routes->post('create', 'Estudiante::create');
+    $routes->put('update/(:num)', 'Estudiante::update/$1');
 });
