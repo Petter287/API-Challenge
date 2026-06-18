@@ -1,0 +1,121 @@
+CREATE TABLE Materia(
+    id INT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL,
+    anio INT NOT NULL,
+
+    createdBy VARCHAR(50) NOT NULL DEFAULT 'system',
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(50) NULL,
+    updatedAt DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deletedBy VARCHAR(50) NULL,
+    deletedAt DATETIME NULL,
+    
+    CONSTRAINT PK_Materia PRIMARY KEY (id),
+    CONSTRAINT UQ_Materia_nombre_anio UNIQUE (nombre, anio)
+);
+
+CREATE TABLE Periodo(
+    id INT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL,
+
+    createdBy VARCHAR(50) NOT NULL DEFAULT 'system',
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(50) NULL,
+    updatedAt DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deletedBy VARCHAR(50) NULL,
+    deletedAt DATETIME NULL,
+    
+    CONSTRAINT PK_Periodo PRIMARY KEY (id),
+    CONSTRAINT UQ_Periodo_nombre UNIQUE (nombre)
+);
+
+CREATE TABLE Espacio_Curricular(
+    id INT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL,
+    idPeriodo INT NOT NULL,
+
+    createdBy VARCHAR(50) NOT NULL DEFAULT 'system',
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(50) NULL,
+    updatedAt DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deletedBy VARCHAR(50) NULL,
+    deletedAt DATETIME NULL,
+    
+    CONSTRAINT PK_Espacio_Curricular PRIMARY KEY (id),
+    CONSTRAINT FK_Periodo_EspCurr FOREIGN KEY (idPeriodo) REFERENCES Periodo (id)
+);
+
+CREATE TABLE Materia_EspacioCurricular(
+	idMateria INT NOT NULL,
+    idEspCurr INT NOT NULL,
+    
+    createdBy VARCHAR(50) NOT NULL DEFAULT 'system',
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(50) NULL,
+    updatedAt DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deletedBy VARCHAR(50) NULL,
+    deletedAt DATETIME NULL,
+
+    CONSTRAINT PK_Mat_EspCurr PRIMARY KEY (idMateria, idEspCurr),
+    CONSTRAINT FK_Mat_EspCurr_Materia FOREIGN KEY (idMateria) REFERENCES Materia (id),
+    CONSTRAINT FK_Mat_EspCurr_Espacio_Curricular FOREIGN KEY (idEspCurr) REFERENCES Espacio_Curricular (id)
+);
+
+CREATE TABLE Estudiante (
+    id INT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    
+    createdBy VARCHAR(50) NOT NULL DEFAULT 'system',
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(50) NULL,
+    updatedAt DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deletedBy VARCHAR(50) NULL,
+    deletedAt DATETIME NULL,
+
+    CONSTRAINT PK_idEstudiante PRIMARY KEY (id)
+);
+
+CREATE TABLE Estado_EspacioCurricular(
+    id INT NOT NULL AUTO_INCREMENT,
+    estado VARCHAR(50) NOT NULL,
+    
+    createdBy VARCHAR(50) NOT NULL DEFAULT 'system',
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(50) NULL,
+    updatedAt DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deletedBy VARCHAR(50) NULL,
+    deletedAt DATETIME NULL,
+    
+    CONSTRAINT PK_Estado_EspCurr PRIMARY KEY (id),
+    CONSTRAINT UQ_Estado_EspCurr_estado UNIQUE (estado)
+);
+
+CREATE TABLE Estudiante_EspacioCurricular(
+    idEstudiante INT NOT NULL,
+    idEspCurr INT NOT NULL,
+    idEstadoEspCurr INT NOT NULL,
+    
+    createdBy VARCHAR(50) NOT NULL DEFAULT 'system',
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedBy VARCHAR(50) NULL,
+    updatedAt DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deletedBy VARCHAR(50) NULL,
+    deletedAt DATETIME NULL,
+
+    CONSTRAINT PK_Estudiante_EspacioCurricular PRIMARY KEY (idEstudiante, idEspCurr),
+    CONSTRAINT FK_Estu_EspCurr_Estudiante FOREIGN KEY (idEstudiante) REFERENCES Estudiante (id),
+    CONSTRAINT FK_Estu_EspCurr_Espacio_Curricular FOREIGN KEY (idEspCurr) REFERENCES Espacio_Curricular (id),
+    CONSTRAINT FK_Estu_EspCurr_Estado_EspacioCurricular FOREIGN KEY (idEstadoEspCurr) REFERENCES Estado_EspacioCurricular (id)
+);
+
+INSERT INTO Estado_EspacioCurricular (estado)
+VALUES  ('sin_calificar'),
+        ('no_iniciado'),
+        ('aprobado'),
+        ('en_proceso');
+
+INSERT INTO Periodo (nombre)
+VALUES  ('anual'),
+        ('primer_cuatrimestre'),
+        ('segundo_cuatrimestre');
