@@ -85,8 +85,11 @@
 
                                             <button
                                                 type="button"
-                                                class="btn btn-danger btn-sm"
-                                                title="Eliminar">
+                                                class="btn btn-danger btn-sm btn-eliminar-estudiante"
+                                                title="Eliminar"
+                                                data-id="<?= esc($estudiante['id']) ?>"
+                                                data-nombre="<?= esc($estudiante['nombre']) ?>"
+                                                data-apellido="<?= esc($estudiante['apellido']) ?>">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
@@ -101,6 +104,39 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Modal eliminar estudiante -->
+    <div class="modal fade" id="modalEliminarEstudiante" tabindex="-1" aria-labelledby="modalEliminarEstudianteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEliminarEstudianteLabel">Eliminar estudiante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="idEstudianteEliminar">
+                    <p class="mb-0">
+                        ¿Seguro que querés dar de baja a
+                        <strong id="nombreEstudianteEliminar"></strong>?
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminarEstudiante">
+                        <i class="bi bi-trash"></i>
+                        Eliminar
+                    </button>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <!-- Modal crear estudiante -->
@@ -179,10 +215,14 @@
         const formCrearEstudiante = document.getElementById('formCrearEstudiante');
         const btnGuardarEstudiante = document.getElementById('btnGuardarEstudiante');
         const btnNuevoEstudiante = document.getElementById('btnNuevoEstudiante');
+        const btnConfirmarEliminarEstudiante = document.getElementById('btnConfirmarEliminarEstudiante');
         const modalCrearEstudianteLabel = document.getElementById('modalCrearEstudianteLabel');
 
         const modalCrearEstudianteElement = document.getElementById('modalCrearEstudiante');
         const modalCrearEstudiante = new bootstrap.Modal(modalCrearEstudianteElement);
+
+        const modalEliminarEstudianteElement = document.getElementById('modalEliminarEstudiante');
+        const modalEliminarEstudiante = new bootstrap.Modal(modalEliminarEstudianteElement);
 
         const toastElement = document.getElementById('toastMensaje');
         const toastTexto = document.getElementById('toastTexto');
@@ -203,6 +243,20 @@
                 id: botonEditar.dataset.id,
                 nombre: botonEditar.dataset.nombre,
                 apellido: botonEditar.dataset.apellido
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            const botonEliminar = event.target.closest('.btn-eliminar-estudiante');
+
+            if (!botonEliminar) {
+                return;
+            }
+
+            prepararModalEliminar({
+                id: botonEliminar.dataset.id,
+                nombre: botonEliminar.dataset.nombre,
+                apellido: botonEliminar.dataset.apellido
             });
         });
 
@@ -274,6 +328,50 @@
             }
         });
 
+        btnConfirmarEliminarEstudiante.addEventListener('click', async function() {
+            const idEstudiante = document.getElementById('idEstudianteEliminar').value;
+
+            if (!idEstudiante) {
+                mostrarToast('No se pudo identificar el estudiante a eliminar.', 'error');
+                return;
+            }
+
+            btnConfirmarEliminarEstudiante.disabled = true;
+            btnConfirmarEliminarEstudiante.innerText = 'Eliminando...';
+
+            try {
+                const response = await fetch(`/estudiante/delete/${idEstudiante}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || result.success === false) {
+                    const mensaje = result.message ?? 'No se pudo eliminar el estudiante.';
+                    mostrarToast(mensaje, 'error');
+                    return;
+                }
+
+                eliminarEstudianteDeTabla(idEstudiante);
+                modalEliminarEstudiante.hide();
+
+                mostrarToast('Estudiante eliminado correctamente.', 'success');
+
+            } catch (error) {
+                mostrarToast('Ocurrió un error inesperado al eliminar el estudiante.', 'error');
+            } finally {
+                btnConfirmarEliminarEstudiante.disabled = false;
+                btnConfirmarEliminarEstudiante.innerHTML = `
+                    <i class="bi bi-trash"></i>
+                    Eliminar
+                `;
+            }
+        });
+
         function prepararModalCrear() {
             modoForm = 'crear';
             formCrearEstudiante.reset();
@@ -290,6 +388,12 @@
             modalCrearEstudianteLabel.innerText = 'Editar estudiante';
             btnGuardarEstudiante.innerText = 'Actualizar';
             modalCrearEstudiante.show();
+        }
+
+        function prepararModalEliminar(estudiante) {
+            document.getElementById('idEstudianteEliminar').value = estudiante.id;
+            document.getElementById('nombreEstudianteEliminar').innerText = `${estudiante.nombre} ${estudiante.apellido}`;
+            modalEliminarEstudiante.show();
         }
 
         function agregarEstudianteATabla(estudiante) {
@@ -343,6 +447,38 @@
             fila.innerHTML = obtenerHtmlFilaEstudiante(estudiante);
         }
 
+        function eliminarEstudianteDeTabla(idEstudiante) {
+            const fila = document.querySelector(`tr[data-id="${CSS.escape(String(idEstudiante))}"]`);
+
+            if (!fila) {
+                return;
+            }
+
+            fila.remove();
+            mostrarMensajeSinEstudiantesSiCorresponde();
+        }
+
+        function mostrarMensajeSinEstudiantesSiCorresponde() {
+            const tbody = document.getElementById('tbodyEstudiantes');
+
+            if (!tbody || tbody.children.length > 0) {
+                return;
+            }
+
+            const contenedorTabla = document.getElementById('contenedorTablaEstudiantes');
+            const contenedorListado = document.getElementById('contenedorListado');
+
+            if (contenedorTabla) {
+                contenedorTabla.remove();
+            }
+
+            contenedorListado.innerHTML = `
+                <div class="alert alert-info mb-0" id="mensajeSinEstudiantes">
+                    No hay estudiantes registrados.
+                </div>
+            `;
+        }
+
         function obtenerHtmlFilaEstudiante(estudiante) {
             return `
                 <td>${escapeHtml(estudiante.id)}</td>
@@ -363,8 +499,11 @@
 
                     <button
                         type="button"
-                        class="btn btn-danger btn-sm"
-                        title="Eliminar estudiante">
+                        class="btn btn-danger btn-sm btn-eliminar-estudiante"
+                        title="Eliminar estudiante"
+                        data-id="${escapeHtml(estudiante.id)}"
+                        data-nombre="${escapeHtml(estudiante.nombre)}"
+                        data-apellido="${escapeHtml(estudiante.apellido)}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>

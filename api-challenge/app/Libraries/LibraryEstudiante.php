@@ -60,4 +60,26 @@ class LibraryEstudiante
             'data' => $updated ? $model->find($id) : null
         ];
     }
+
+    public function delete(int $id)
+    {
+        $model = new Estudiante_model();
+        $estudianteExistente = $model->find($id);
+
+        if (!$estudianteExistente) {
+            return [
+                'success' => false,
+                'message' => 'Estudiante no encontrado.',
+                'data' => null
+            ];
+        }
+
+        $deleted = $model->delete($id);
+
+        return [
+            'success' => $deleted,
+            'message' => $deleted ? 'Estudiante eliminado exitosamente.' : 'Error al eliminar el estudiante.',
+            'data' => null
+        ];
+    }
 }

@@ -70,4 +70,13 @@ class Estudiante extends BaseController
             ->setStatusCode($result['success'] ? 200 : 500)
             ->setJSON($result);
     }
+
+    public function delete(int $id)
+    {
+        $library = new LibraryEstudiante();
+        $result = $library->delete($id);
+        return $this->response
+            ->setStatusCode($result['success'] ? 200 : 500)
+            ->setJSON($result);
+    }
 }
