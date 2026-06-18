@@ -19,16 +19,18 @@ class LibraryEstudiante
         $estudiante = new EstudianteEntity();
         $estudiante->nombre = $data['nombre'] ?? null;
         $estudiante->apellido = $data['apellido'] ?? null;
-        $estudiante->createdBy = $data['createdBy'] ?? null;
-        $estudiante->createdAt = new DateTime();
 
         $model = new Estudiante_model();
         $idEstudiante = $model->insert($estudiante, true);
 
+        $dataEstudiante = $idEstudiante
+                          ? $model ->find($idEstudiante)
+                          : null;
+
         $structReturn = [
             'success' => $idEstudiante ? true : false,
             'message' => $idEstudiante ? 'Estudiante creado exitosamente.' : 'Error al crear el estudiante.',
-            'data' => $estudiante ?: null
+            'data' => $dataEstudiante ?: null
         ];
 
         return $structReturn;

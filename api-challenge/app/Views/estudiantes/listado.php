@@ -282,13 +282,13 @@
                 return fecha;
             }
 
-            return date.toLocaleString('es-AR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            const dia = String(date.getDate()).padStart(2, '0');
+            const mes = String(date.getMonth() + 1).padStart(2, '0');
+            const anio = date.getFullYear();
+            const hora = String(date.getHours()).padStart(2, '0');
+            const minutos = String(date.getMinutes()).padStart(2, '0');
+
+            return `${dia}/${mes}/${anio} ${hora}:${minutos}`;
         }
 
         function escapeHtml(value) {
