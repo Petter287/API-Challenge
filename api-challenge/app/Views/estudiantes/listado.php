@@ -26,10 +26,16 @@
                 <p class="text-muted mb-0">Listado de estudiantes registrados</p>
             </div>
 
-            <button type="button" class="btn btn-primary" id="btnNuevoEstudiante" data-bs-toggle="modal" data-bs-target="#modalCrearEstudiante">
-                <i class="bi bi-person-plus"></i>
-                Nuevo
-            </button>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary" id="btnNuevoEstudiante" data-bs-toggle="modal" data-bs-target="#modalCrearEstudiante">
+                    <i class="bi bi-person-plus"></i>
+                    Nuevo
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="btnActualizarGrilla">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Actualizar
+                </button>
+            </div>
         </div>
 
         <div class="card shadow-sm">
@@ -266,6 +272,36 @@
             prepararModalCrear();
         });
 
+        const btnActualizarGrilla = document.getElementById('btnActualizarGrilla');
+
+        btnActualizarGrilla.addEventListener('click', async function() {
+            btnActualizarGrilla.disabled = true;
+
+            try {
+                const response = await fetch('/estudiante/list', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || result.success === false) {
+                    mostrarToast(result.message ?? 'No se pudo actualizar la grilla.', 'error');
+                    return;
+                }
+
+                renderizarTablaEstudiantes(result.data);
+                mostrarToast('Grilla actualizada correctamente.', 'success');
+
+            } catch (error) {
+                mostrarToast('Ocurrió un error al actualizar la grilla.', 'error');
+            } finally {
+                btnActualizarGrilla.disabled = false;
+            }
+        });
+
         document.addEventListener('click', function(event) {
             const botonEditar = event.target.closest('.btn-editar-estudiante');
 
@@ -317,9 +353,9 @@
 
             try {
                 const esEdicion = modoForm === 'editar';
-                const url = modoForm === 'editar'
-                    ? `/estudiante/update/${idEstudiante}`
-                    : '/estudiante/create';
+                const url = modoForm === 'editar' ?
+                    `/estudiante/update/${idEstudiante}` :
+                    '/estudiante/create';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -356,9 +392,9 @@
                 prepararModalCrear();
 
                 mostrarToast(
-                    esEdicion
-                        ? 'Estudiante actualizado correctamente.'
-                        : 'Estudiante creado correctamente.',
+                    esEdicion ?
+                    'Estudiante actualizado correctamente.' :
+                    'Estudiante creado correctamente.',
                     'success'
                 );
 
@@ -623,6 +659,48 @@
                 .replaceAll('>', '&gt;')
                 .replaceAll('"', '&quot;')
                 .replaceAll("'", '&#039;');
+        }
+
+        function renderizarTablaEstudiantes(estudiantes) {
+            const contenedorListado = document.getElementById('contenedorListado');
+
+            if (!estudiantes || estudiantes.length === 0) {
+                contenedorListado.innerHTML = `
+                    <div class="alert alert-info mb-0" id="mensajeSinEstudiantes">
+                        No hay estudiantes registrados.
+                    </div>
+                `;
+                return;
+            }
+
+            contenedorListado.innerHTML = `
+                <div class="table-responsive" id="contenedorTablaEstudiantes">
+                    <table class="table table-striped table-hover align-middle mb-0" id="tablaEstudiantes">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 80px;">ID</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>DNI</th>
+                                <th>Fecha nacimiento</th>
+                                <th>Creado por</th>
+                                <th>Fecha creación</th>
+                                <th style="width: 140px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyEstudiantes"></tbody>
+                    </table>
+                </div>
+            `;
+
+            const tbody = document.getElementById('tbodyEstudiantes');
+
+            estudiantes.forEach(function(estudiante) {
+                const fila = document.createElement('tr');
+                fila.dataset.id = estudiante.id;
+                fila.innerHTML = obtenerHtmlFilaEstudiante(estudiante);
+                tbody.appendChild(fila);
+            });
         }
     </script>
 

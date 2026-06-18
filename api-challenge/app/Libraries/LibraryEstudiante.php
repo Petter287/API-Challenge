@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Libraries;
+
 use App\Models\Estudiante_model;
 use App\Entities\EstudianteEntity;
 
@@ -22,11 +23,25 @@ class LibraryEstudiante
         $estudiante->fechaNacimiento = $data['fechaNacimiento'] ?? null;
 
         $model = new Estudiante_model();
+
+        $existeDni = $model
+            ->where('dni', $data['dni'])
+            ->first();
+
+        if ($existeDni) {
+            return [
+                'success' => false,
+                'message' => 'Ya existe un estudiante con ese DNI.',
+                'data' => null,
+                'statusCode' => 409
+            ];
+        }
+
         $idEstudiante = $model->insert($estudiante, true);
 
         $dataEstudiante = $idEstudiante
-                          ? $model ->find($idEstudiante)
-                          : null;
+            ? $model->find($idEstudiante)
+            : null;
 
         $structReturn = [
             'success' => $idEstudiante ? true : false,
@@ -47,6 +62,20 @@ class LibraryEstudiante
                 'success' => false,
                 'message' => 'Estudiante no encontrado.',
                 'data' => null
+            ];
+        }
+
+        $existeDni = $model
+            ->where('dni', $data['dni'])
+            ->where('id !=', $id)
+            ->first();
+
+        if ($existeDni) {
+            return [
+                'success' => false,
+                'message' => 'Ya existe otro estudiante con ese DNI.',
+                'data' => null,
+                'statusCode' => 409
             ];
         }
 
@@ -73,7 +102,8 @@ class LibraryEstudiante
             return [
                 'success' => false,
                 'message' => 'Estudiante no encontrado.',
-                'data' => null
+                'data' => null,
+                'statusCode' => 404
             ];
         }
 
