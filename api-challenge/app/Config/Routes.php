@@ -28,3 +28,11 @@ $routes->group('estado-espacio-curricular', function($routes) {
     $routes->delete('delete/(:num)', 'EstadoEspacioCurricular::delete/$1');
     $routes->get('list', 'EstadoEspacioCurricular::list');
 });
+
+$routes->group('materia', function($routes) {
+    $routes->get('/', 'Materia::index');
+    $routes->post('create', 'Materia::create');
+    $routes->put('update/(:num)', 'Materia::update/$1');
+    $routes->delete('delete/(:num)', 'Materia::delete/$1');
+    $routes->get('list', 'Materia::list');
+});
