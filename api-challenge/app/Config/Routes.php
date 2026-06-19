@@ -36,3 +36,12 @@ $routes->group('materia', function($routes) {
     $routes->delete('delete/(:num)', 'Materia::delete/$1');
     $routes->get('list', 'Materia::list');
 });
+
+$routes->group('espacio-curricular', function($routes) {
+    $routes->get('/', 'EspacioCurricular::index');
+    $routes->post('create', 'EspacioCurricular::create');
+    $routes->put('update/(:num)', 'EspacioCurricular::update/$1');
+    $routes->delete('delete/(:num)', 'EspacioCurricular::delete/$1');
+    $routes->get('list', 'EspacioCurricular::list');
+    $routes->get('periodos', 'EspacioCurricular::periodos');
+});
