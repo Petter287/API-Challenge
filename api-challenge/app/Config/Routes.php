@@ -45,3 +45,12 @@ $routes->group('espacio-curricular', function($routes) {
     $routes->get('list', 'EspacioCurricular::list');
     $routes->get('periodos', 'EspacioCurricular::periodos');
 });
+
+$routes->group('materia-espacio-curricular', function($routes) {
+    $routes->get('/', 'MateriaEspacioCurricular::index');
+    $routes->post('create', 'MateriaEspacioCurricular::create');
+    $routes->put('update/(:num)/(:num)', 'MateriaEspacioCurricular::update/$1/$2');
+    $routes->delete('delete/(:num)/(:num)', 'MateriaEspacioCurricular::delete/$1/$2');
+    $routes->get('list', 'MateriaEspacioCurricular::list');
+    $routes->get('options', 'MateriaEspacioCurricular::options');
+});
