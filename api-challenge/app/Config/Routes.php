@@ -12,3 +12,11 @@ $routes->group('estudiante', function($routes) {
     $routes->delete('delete/(:num)', 'Estudiante::delete/$1');
     $routes->get('list', 'Estudiante::list');
 });
+
+$routes->group('periodo', function($routes){
+    $routes->get('/', 'Periodo::index');
+    $routes->post('create', 'Periodo::create');
+    $routes->put('update/(:num)', 'Periodo::update/$1');
+    $routes->delete('delete/(:num)', 'Periodo::delete/$1');
+    $routes->get('list', 'Periodo::list');
+});
