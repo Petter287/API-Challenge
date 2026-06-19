@@ -20,3 +20,11 @@ $routes->group('periodo', function($routes){
     $routes->delete('delete/(:num)', 'Periodo::delete/$1');
     $routes->get('list', 'Periodo::list');
 });
+
+$routes->group('estado-espacio-curricular', function($routes) {
+    $routes->get('/', 'EstadoEspacioCurricular::index');
+    $routes->post('create', 'EstadoEspacioCurricular::create');
+    $routes->put('update/(:num)', 'EstadoEspacioCurricular::update/$1');
+    $routes->delete('delete/(:num)', 'EstadoEspacioCurricular::delete/$1');
+    $routes->get('list', 'EstadoEspacioCurricular::list');
+});
