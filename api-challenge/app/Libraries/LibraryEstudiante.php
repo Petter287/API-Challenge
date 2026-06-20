@@ -3,31 +3,37 @@
 namespace App\Libraries;
 
 use App\Models\Estudiante_model;
-use App\Entities\EstudianteEntity;
 
 class LibraryEstudiante
 {
+    private Estudiante_model $model;
+    
+    public function __construct()
+    {
+        $this->model = new Estudiante_model();
+    }
+
     public function getAll()
     {
-        $model = new Estudiante_model();
-        $data['estudiantes'] = $model->findAll();
+        $data['estudiantes'] = $this->model->findAll();
         return $data;
     }
 
     public function create(array $data)
     {
-        $estudiante = new EstudianteEntity();
-        $estudiante->nombre = $data['nombre'] ?? null;
-        $estudiante->apellido = $data['apellido'] ?? null;
-        $estudiante->dni = $data['dni'] ?? null;
-        $estudiante->fechaNacimiento = $data['fechaNacimiento'] ?? null;
+        $dataEstudiante = [
+            'nombre' => $data['nombre'] ?? null,
+            'apellido' => $data['apellido'] ?? null,
+            'dni' => $data['dni'] ?? null,
+            'fechaNacimiento' => $data['fechaNacimiento'] ?? null,
+        ];
 
-        $model = new Estudiante_model();
+        $params = [
+            'dni' => $dataEstudiante['dni'],
+            'limit' => 1
+        ];
 
-        $existeDni = $model
-            ->where('dni', $data['dni'])
-            ->first();
-
+        $existeDni = $this->model->encontrarEstudiante($params);
         if ($existeDni) {
             return [
                 'success' => false,
@@ -37,26 +43,22 @@ class LibraryEstudiante
             ];
         }
 
-        $idEstudiante = $model->insert($estudiante, true);
+        $idEstudiante = $this->model->nuevoEstudiante($dataEstudiante);
 
         $dataEstudiante = $idEstudiante
-            ? $model->find($idEstudiante)
+            ? $this->model->find($idEstudiante)
             : null;
 
-        $structReturn = [
+        return [
             'success' => $idEstudiante ? true : false,
             'message' => $idEstudiante ? 'Estudiante creado exitosamente.' : 'Error al crear el estudiante.',
             'data' => $dataEstudiante ?: null
         ];
-
-        return $structReturn;
     }
 
     public function update(int $id, array $data)
     {
-        $model = new Estudiante_model();
-        $estudianteExistente = $model->find($id);
-
+        $estudianteExistente = $this->model->find($id);
         if (!$estudianteExistente) {
             return [
                 'success' => false,
@@ -65,39 +67,40 @@ class LibraryEstudiante
             ];
         }
 
-        $existeDni = $model
-            ->where('dni', $data['dni'])
-            ->where('id !=', $id)
-            ->first();
+        $dataEstudiante = [
+            'nombre' => $data['nombre'] ?? null,
+            'apellido' => $data['apellido'] ?? null,
+            'dni' => $data['dni'] ?? null,
+            'fechaNacimiento' => $data['fechaNacimiento'] ?? null,
+        ];
 
-        if ($existeDni) {
+        $params = [
+            'dni' => $dataEstudiante['dni'],
+            'limit' => 1
+        ];
+
+        $existeDni = $this->model->encontrarEstudiante($params);
+        if ($existeDni && $existeDni->id != $id) {
             return [
                 'success' => false,
-                'message' => 'Ya existe otro estudiante con ese DNI.',
+                'message' => 'Ya existe un estudiante con ese DNI.',
                 'data' => null,
                 'statusCode' => 409
             ];
         }
 
-        $updated = $model->update($id, [
-            'nombre' => $data['nombre'],
-            'apellido' => $data['apellido'],
-            'dni' => $data['dni'],
-            'fechaNacimiento' => $data['fechaNacimiento']
-        ]);
+        $updated = $this->model->actualizarEstudiante($id, $dataEstudiante);
 
         return [
             'success' => $updated,
             'message' => $updated ? 'Estudiante actualizado exitosamente.' : 'Error al actualizar el estudiante.',
-            'data' => $updated ? $model->find($id) : null
+            'data' => $updated ? $this->model->find($id) : null
         ];
     }
 
     public function delete(int $id)
     {
-        $model = new Estudiante_model();
-        $estudianteExistente = $model->find($id);
-
+        $estudianteExistente = $this->model->find($id);
         if (!$estudianteExistente) {
             return [
                 'success' => false,
@@ -107,7 +110,7 @@ class LibraryEstudiante
             ];
         }
 
-        $deleted = $model->delete($id);
+        $deleted = $this->model->delete($id);
 
         return [
             'success' => $deleted,

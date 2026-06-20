@@ -3,28 +3,30 @@
 namespace App\Libraries;
 
 use App\Models\Periodo_model;
-use App\Entities\PeriodoEntity;
 
 class LibraryPeriodo
 {
+    private Periodo_model $model;
+
+    public function __construct()
+    {
+        $this->model = new Periodo_model();
+    }
+
     public function getAll()
     {
-        $model = new Periodo_model();
-        $data['periodos'] = $model->findAll();
+        $data['periodos'] = $this->model->findAll();
         return $data;
     }
 
     public function create(array $data)
     {
-        $periodo = new PeriodoEntity();
-        $periodo->nombre = $data['nombre'] ?? null;
+        $params = [
+            'nombre' => $data['nombre'] ?? null,
+            'limit' => 1
+        ];
 
-        $model = new Periodo_model();
-
-        $existePeriodo = $model
-            ->where('nombre', $data['nombre'])
-            ->first();
-
+        $existePeriodo = $this->model->encontrarPeriodo($params);
         if ($existePeriodo) {
             return [
                 'success' => false,
@@ -34,64 +36,22 @@ class LibraryPeriodo
             ];
         }
 
-        $idPeriodo = $model->insert($periodo, true);
+        $idPeriodo = $this->model->nuevoPeriodo($params);
 
         $dataPeriodo = $idPeriodo
-            ? $model->find($idPeriodo)
+            ? $this->model->find($idPeriodo)
             : null;
 
-        $structReturn = [
+        return [
             'success' => $idPeriodo ? true : false,
             'message' => $idPeriodo ? 'Periodo creado exitosamente.' : 'Error al crear el periodo.',
             'data' => $dataPeriodo ?: null
         ];
-
-        return $structReturn;
     }
 
     public function update(int $id, array $data)
     {
-        $model = new Periodo_model();
-        $periodoExistente = $model->find($id);
-
-        if (!$periodoExistente) {
-            return [
-                'success' => false,
-                'message' => 'Periodo no encontrado.',
-                'data' => null
-            ];
-        }
-
-        $existePeriodo = $model
-            ->where('nombre', $data['nombre'])
-            ->where('id !=', $id)
-            ->first();
-
-        if ($existePeriodo) {
-            return [
-                'success' => false,
-                'message' => 'Ya existe otro periodo con ese nombre.',
-                'data' => null,
-                'statusCode' => 409
-            ];
-        }
-
-        $updated = $model->update($id, [
-            'nombre' => $data['nombre']
-        ]);
-
-        return [
-            'success' => $updated,
-            'message' => $updated ? 'Periodo actualizado exitosamente.' : 'Error al actualizar el periodo.',
-            'data' => $updated ? $model->find($id) : null
-        ];
-    }
-
-    public function delete(int $id)
-    {
-        $model = new Periodo_model();
-        $periodoExistente = $model->find($id);
-
+        $periodoExistente = $this->model->find($id);
         if (!$periodoExistente) {
             return [
                 'success' => false,
@@ -101,7 +61,43 @@ class LibraryPeriodo
             ];
         }
 
-        $deleted = $model->delete($id);
+        $params = [
+            'nombre' => $data['nombre'] ?? null,
+            'limit' => 1
+        ];
+
+        $existePeriodo = $this->model->encontrarPeriodo($params);
+        if ($existePeriodo) {
+            return [
+                'success' => false,
+                'message' => 'Ya existe otro periodo con ese nombre.',
+                'data' => null,
+                'statusCode' => 409
+            ];
+        }
+
+        $updated = $this->model->actualizarPeriodo($id, $params);
+
+        return [
+            'success' => $updated,
+            'message' => $updated ? 'Periodo actualizado exitosamente.' : 'Error al actualizar el periodo.',
+            'data' => $updated ? $this->model->find($id) : null
+        ];
+    }
+
+    public function delete(int $id)
+    {
+        $periodoExistente = $this->model->find($id);
+        if (!$periodoExistente) {
+            return [
+                'success' => false,
+                'message' => 'Periodo no encontrado.',
+                'data' => null,
+                'statusCode' => 404
+            ];
+        }
+
+        $deleted = $this->model->delete($id);
 
         return [
             'success' => $deleted,

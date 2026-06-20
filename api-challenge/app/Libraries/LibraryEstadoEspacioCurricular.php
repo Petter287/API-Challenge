@@ -2,29 +2,31 @@
 
 namespace App\Libraries;
 
-use App\Entities\EstadoEspacioCurricularEntity;
 use App\Models\Estado_EspacioCurricular_model;
 
 class LibraryEstadoEspacioCurricular
 {
+    private Estado_EspacioCurricular_model $model;
+
+    public function __construct()
+    {
+        $this->model = new Estado_EspacioCurricular_model();
+    }
+
     public function getAll()
     {
-        $model = new Estado_EspacioCurricular_model();
-        $data['estados'] = $model->findAll();
+        $data['estados'] = $this->model->findAll();
         return $data;
     }
 
     public function create(array $data)
     {
-        $estadoEspacioCurricular = new EstadoEspacioCurricularEntity();
-        $estadoEspacioCurricular->estado = $data['estado'] ?? null;
+        $params = [
+            'estado' => $data['estado'] ?? null,
+            'limit' => 1
+        ];
 
-        $model = new Estado_EspacioCurricular_model();
-
-        $existeEstado = $model
-            ->where('estado', $data['estado'])
-            ->first();
-
+        $existeEstado = $this->model->encontrarEstado($params);
         if ($existeEstado) {
             return [
                 'success' => false,
@@ -34,10 +36,10 @@ class LibraryEstadoEspacioCurricular
             ];
         }
 
-        $idEstado = $model->insert($estadoEspacioCurricular, true);
+        $idEstado = $this->model->nuevoEstado($params);
 
         $dataEstado = $idEstado
-            ? $model->find($idEstado)
+            ? $this->model->find($idEstado)
             : null;
 
         return [
@@ -49,9 +51,7 @@ class LibraryEstadoEspacioCurricular
 
     public function update(int $id, array $data)
     {
-        $model = new Estado_EspacioCurricular_model();
-        $estadoExistente = $model->find($id);
-
+        $estadoExistente = $this->model->find($id);
         if (!$estadoExistente) {
             return [
                 'success' => false,
@@ -61,11 +61,12 @@ class LibraryEstadoEspacioCurricular
             ];
         }
 
-        $existeEstado = $model
-            ->where('estado', $data['estado'])
-            ->where('id !=', $id)
-            ->first();
+        $params = [
+            'estado' => $data['estado'] ?? null,
+            'limit' => 1
+        ];
 
+        $existeEstado = $this->model->encontrarEstado($params);
         if ($existeEstado) {
             return [
                 'success' => false,
@@ -75,22 +76,18 @@ class LibraryEstadoEspacioCurricular
             ];
         }
 
-        $updated = $model->update($id, [
-            'estado' => $data['estado']
-        ]);
+        $updated = $this->model->actualizarEstado($id, $data);
 
         return [
             'success' => $updated,
             'message' => $updated ? 'Estado actualizado exitosamente.' : 'Error al actualizar el estado.',
-            'data' => $updated ? $model->find($id) : null
+            'data' => $updated ? $this->model->find($id) : null
         ];
     }
 
     public function delete(int $id)
     {
-        $model = new Estado_EspacioCurricular_model();
-        $estadoExistente = $model->find($id);
-
+        $estadoExistente = $this->model->find($id);
         if (!$estadoExistente) {
             return [
                 'success' => false,
@@ -100,7 +97,7 @@ class LibraryEstadoEspacioCurricular
             ];
         }
 
-        $deleted = $model->delete($id);
+        $deleted = $this->model->delete($id);
 
         return [
             'success' => $deleted,

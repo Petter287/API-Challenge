@@ -2,43 +2,44 @@
 
 namespace App\Libraries;
 
-use App\Entities\EspacioCurricularEntity;
 use App\Models\EspacioCurricular_model;
 use App\Models\Periodo_model;
 
 class LibraryEspacioCurricular
 {
+    private EspacioCurricular_model $model;
+
+    public function __construct()
+    {
+        $this->model = new EspacioCurricular_model();
+    }
+
     public function getAll()
     {
-        $model = new EspacioCurricular_model();
-
-        $data['espaciosCurriculares'] = $model
-            ->select('Espacio_Curricular.*, Periodo.nombre AS periodoNombre')
-            ->join('Periodo', 'Periodo.id = Espacio_Curricular.idPeriodo')
-            ->findAll();
-
+        $data['espaciosCurriculares'] = $this->model->obtenerEspaciosCurriculares();
         return $data;
     }
 
     public function create(array $data)
     {
-        $validacionPeriodo = $this->validarPeriodo($data['idPeriodo']);
-
-        if ($validacionPeriodo) {
-            return $validacionPeriodo;
+        $periodoModel = new Periodo_model();
+        $existePeriodo = $periodoModel->find($data['idPeriodo']);
+        if (!$existePeriodo) {
+            return [
+                'success' => false,
+                'message' => 'Periodo no encontrado.',
+                'data' => null,
+                'statusCode' => 404
+            ];
         }
 
-        $espacioCurricular = new EspacioCurricularEntity();
-        $espacioCurricular->nombre = $data['nombre'] ?? null;
-        $espacioCurricular->idPeriodo = (int) ($data['idPeriodo'] ?? 0);
+        $params=[
+            'nombre' => $data['nombre'] ?? null,
+            'idPeriodo' => (int) ($data['idPeriodo'] ?? 0),
+            'limit' => 1
+        ];
 
-        $model = new EspacioCurricular_model();
-
-        $existeEspacioCurricular = $model
-            ->where('nombre', $data['nombre'])
-            ->where('idPeriodo', $data['idPeriodo'])
-            ->first();
-
+        $existeEspacioCurricular = $this->model->encontrarEspacioCurricular($params);
         if ($existeEspacioCurricular) {
             return [
                 'success' => false,
@@ -48,10 +49,10 @@ class LibraryEspacioCurricular
             ];
         }
 
-        $idEspacioCurricular = $model->insert($espacioCurricular, true);
+        $idEspacioCurricular = $this->model->nuevoEspacioCurricular($params);
 
         $dataEspacioCurricular = $idEspacioCurricular
-            ? $this->findWithPeriodo($idEspacioCurricular)
+            ? $this->model->obtenerEspaciosCurriculares(['id' => $idEspacioCurricular]) [0]
             : null;
 
         return [
@@ -63,9 +64,7 @@ class LibraryEspacioCurricular
 
     public function update(int $id, array $data)
     {
-        $model = new EspacioCurricular_model();
-        $espacioCurricularExistente = $model->find($id);
-
+        $espacioCurricularExistente = $this->model->find($id);
         if (!$espacioCurricularExistente) {
             return [
                 'success' => false,
@@ -75,44 +74,49 @@ class LibraryEspacioCurricular
             ];
         }
 
-        $validacionPeriodo = $this->validarPeriodo($data['idPeriodo']);
-
-        if ($validacionPeriodo) {
-            return $validacionPeriodo;
+        $periodoModel = new Periodo_model();
+        $existePeriodo = $periodoModel->find($data['idPeriodo']);
+        if (!$existePeriodo) {
+            return [
+                'success' => false,
+                'message' => 'Periodo no encontrado.',
+                'data' => null,
+                'statusCode' => 404
+            ];
         }
 
-        $existeEspacioCurricular = $model
-            ->where('nombre', $data['nombre'])
-            ->where('idPeriodo', $data['idPeriodo'])
-            ->where('id !=', $id)
-            ->first();
+        $params=[
+            'nombre' => $data['nombre'] ?? null,
+            'idPeriodo' => (int) ($data['idPeriodo'] ?? 0),
+            'limit' => 1
+        ];
 
+        $existeEspacioCurricular = $this->model->encontrarEspacioCurricular($params);
         if ($existeEspacioCurricular) {
             return [
                 'success' => false,
-                'message' => 'Ya existe otro espacio curricular con ese nombre y período.',
+                'message' => 'Ya existe un espacio curricular con ese nombre y período.',
                 'data' => null,
                 'statusCode' => 409
             ];
         }
 
-        $updated = $model->update($id, [
-            'nombre' => $data['nombre'],
-            'idPeriodo' => $data['idPeriodo']
-        ]);
+        $updated = $this->model->actualizarEspacioCurricular($id, $params);
+
+        $dataEspacioCurricular = $updated
+            ? $this->model->obtenerEspaciosCurriculares(['id' => $id]) [0]
+            : null;
 
         return [
             'success' => $updated,
             'message' => $updated ? 'Espacio curricular actualizado exitosamente.' : 'Error al actualizar el espacio curricular.',
-            'data' => $updated ? $this->findWithPeriodo($id) : null
+            'data' => $updated ? $dataEspacioCurricular : null
         ];
     }
 
     public function delete(int $id)
     {
-        $model = new EspacioCurricular_model();
-        $espacioCurricularExistente = $model->find($id);
-
+        $espacioCurricularExistente = $this->model->find($id);
         if (!$espacioCurricularExistente) {
             return [
                 'success' => false,
@@ -122,40 +126,12 @@ class LibraryEspacioCurricular
             ];
         }
 
-        $deleted = $model->delete($id);
+        $deleted = $this->model->delete($id);
 
         return [
             'success' => $deleted,
             'message' => $deleted ? 'Espacio curricular eliminado exitosamente.' : 'Error al eliminar el espacio curricular.',
             'data' => null
         ];
-    }
-
-    private function findWithPeriodo(int $id)
-    {
-        $model = new EspacioCurricular_model();
-
-        return $model
-            ->select('Espacio_Curricular.*, Periodo.nombre AS periodoNombre')
-            ->join('Periodo', 'Periodo.id = Espacio_Curricular.idPeriodo')
-            ->where('Espacio_Curricular.id', $id)
-            ->first();
-    }
-
-    private function validarPeriodo(int $idPeriodo): ?array
-    {
-        $periodoModel = new Periodo_model();
-        $periodo = $periodoModel->find($idPeriodo);
-
-        if (!$periodo) {
-            return [
-                'success' => false,
-                'message' => 'El período seleccionado no existe.',
-                'data' => null,
-                'statusCode' => 400
-            ];
-        }
-
-        return null;
     }
 }

@@ -2,78 +2,66 @@
 
 namespace App\Libraries;
 
-use App\Entities\MateriaEspacioCurricularEntity;
 use App\Models\Materia_EspacioCurricular_model;
 use App\Models\Materia_model;
 use App\Models\EspacioCurricular_model;
 
 class LibraryMateriaEspacioCurricular
 {
+    private Materia_EspacioCurricular_model $model;
+
+    public function __construct()
+    {
+        $this->model = new Materia_EspacioCurricular_model();
+    }
+
     public function getAll()
     {
-        $data['materiasEspaciosCurriculares'] = db_connect()
-            ->table('Materia_EspacioCurricular')
-            ->select('Materia_EspacioCurricular.*, Materia.nombre as nombreMateria, Espacio_Curricular.nombre as nombreEspacioCurricular')
-            ->join('Materia', 'Materia.id = Materia_EspacioCurricular.idMateria')
-            ->join('Espacio_Curricular', 'Espacio_Curricular.id = Materia_EspacioCurricular.idEspCurr')
-            ->where('Materia_EspacioCurricular.deletedBy', null)
-            ->where('Materia_EspacioCurricular.deletedAt', null)
-            ->get()
-            ->getResultArray();
-
+        $data['materiasEspaciosCurriculares'] = $this->model->obtenerMatEspCurr();
         return $data;
     }
 
     public function create(array $data)
     {
-        $idMateria = (int) ($data['idMateria'] ?? 0);
-        $idEspCurr = (int) ($data['idEspCurr'] ?? 0);
-
-        $validacionMateria = $this->validarMateria($idMateria);
-
-        if ($validacionMateria) {
-            return $validacionMateria;
+        $materiaModel = new Materia_model();
+        $existeMateria = $materiaModel->find($data['idMateria']);
+        if (!$existeMateria) {
+            return [
+                'success' => false,
+                'message' => 'Materia no encontrada.',
+                'data' => null,
+                'statusCode' => 404
+            ];
         }
 
-        $validacionEspacioCurricular = $this->validarEspacioCurricular($idEspCurr);
-
-        if ($validacionEspacioCurricular) {
-            return $validacionEspacioCurricular;
+        $espacioCurricularModel = new EspacioCurricular_model();
+        $existeEspacioCurricular = $espacioCurricularModel->find($data['idEspCurr']);
+        if (!$existeEspacioCurricular) {
+            return [
+                'success' => false,
+                'message' => 'Espacio Curricular no encontrado.',
+                'data' => null,
+                'statusCode' => 404
+            ];
         }
 
-        $materiaEspacioCurricular = new MateriaEspacioCurricularEntity();
-        $materiaEspacioCurricular->idMateria = $idMateria;
-        $materiaEspacioCurricular->idEspCurr = $idEspCurr;
+        $params = [
+            'idMateria' => (int) ($data['idMateria'] ?? 0),
+            'idEspCurr' => (int) ($data['idEspCurr'] ?? 0),
+            'limit' => 1
+        ];
 
-        $model = new Materia_EspacioCurricular_model();
-
-        $existeMateriaEspacioCurricular = db_connect()
-            ->table('Materia_EspacioCurricular')
-            ->where('idMateria', $idMateria)
-            ->where('idEspCurr', $idEspCurr)
-            ->get()
-            ->getRowArray();
-
-        if ($existeMateriaEspacioCurricular) {
-            $estaDadaDeBaja = !empty($existeMateriaEspacioCurricular['deletedBy'])
-                || !empty($existeMateriaEspacioCurricular['deletedAt']);
+        $existeMatEspCurr = $this->model->encontrarMatEspCurr($params);
+        if ($existeMatEspCurr) {
+            $estaDadaDeBaja = !empty($existeMatEspCurr->deletedBy) || !empty($existeMatEspCurr->deletedAt);
 
             if ($estaDadaDeBaja) {
-                $reactivated = db_connect()
-                    ->table('Materia_EspacioCurricular')
-                    ->where('idMateria', $idMateria)
-                    ->where('idEspCurr', $idEspCurr)
-                    ->update([
-                        'deletedBy' => null,
-                        'deletedAt' => null,
-                        'updatedBy' => 'system',
-                        'updatedAt' => date('Y-m-d H:i:s')
-                    ]);
+                $reactivated = $this->model->reactivarMatEspCurr($params['idMateria'], $params['idEspCurr']);
 
                 return [
                     'success' => $reactivated,
                     'message' => $reactivated ? 'Relación de Materia y Espacio Curricular creada correctamente.' : 'Error al reactivar la relación Materia - Espacio curricular.',
-                    'data' => $reactivated ? $this->findWithMateriaEspacioCurricular($idMateria, $idEspCurr) : null
+                    'data' => $reactivated ? $this->model->obtenerMatEspCurr($params)[0] : null
                 ];
             }
 
@@ -85,10 +73,10 @@ class LibraryMateriaEspacioCurricular
             ];
         }
 
-        $inserted = $model->insert($materiaEspacioCurricular) !== false;
+        $inserted = $this->model->nuevoMatEspCurr($data) !== false;
 
         $dataMateriaEspacioCurricular = $inserted
-            ? $this->findWithMateriaEspacioCurricular($idMateria, $idEspCurr)
+            ? $this->model->obtenerMatEspCurr($params)[0]
             : null;
 
         return [
@@ -98,19 +86,19 @@ class LibraryMateriaEspacioCurricular
         ];
     }
 
-    public function update(int $idMateriaActual, int $idEspCurrActual, array $data)
-    {
-        $idMateria = (int) ($data['idMateria'] ?? 0);
-        $idEspCurr = (int) ($data['idEspCurr'] ?? 0);
+    public function update(
+        int $idMateriaActual,
+        int $idEspCurrActual,
+        array $data
+    ) {
+        $paramsActuales = [
+            'idMateria' => $idMateriaActual,
+            'idEspCurr' => $idEspCurrActual,
+            'limit' => 1
+        ];
 
-        $materiaEspacioCurricularExistente = db_connect()
-            ->table('Materia_EspacioCurricular')
-            ->where('idMateria', $idMateriaActual)
-            ->where('idEspCurr', $idEspCurrActual)
-            ->where('deletedBy', null)
-            ->where('deletedAt', null)
-            ->get()
-            ->getRowArray();
+        $materiaEspacioCurricularExistente =
+            $this->model->encontrarMatEspCurr($paramsActuales);
 
         if (!$materiaEspacioCurricularExistente) {
             return [
@@ -121,63 +109,68 @@ class LibraryMateriaEspacioCurricular
             ];
         }
 
-        $validacionMateria = $this->validarMateria($idMateria);
+        $nuevosDatos = [
+            'idMateria' => (int) ($data['idMateria'] ?? $idMateriaActual),
+            'idEspCurr' => (int) ($data['idEspCurr'] ?? $idEspCurrActual),
+        ];
 
-        if ($validacionMateria) {
-            return $validacionMateria;
+        $materiaModel = new Materia_model();
+        $existeMateria = $materiaModel->find($nuevosDatos['idMateria']);
+
+        if (!$existeMateria) {
+            return [
+                'success' => false,
+                'message' => 'Materia no encontrada.',
+                'data' => null,
+                'statusCode' => 404
+            ];
         }
 
-        $validacionEspacioCurricular = $this->validarEspacioCurricular($idEspCurr);
+        $espacioCurricularModel = new EspacioCurricular_model();
+        $existeEspacioCurricular =
+            $espacioCurricularModel->find($nuevosDatos['idEspCurr']);
 
-        if ($validacionEspacioCurricular) {
-            return $validacionEspacioCurricular;
+        if (!$existeEspacioCurricular) {
+            return [
+                'success' => false,
+                'message' => 'Espacio Curricular no encontrado.',
+                'data' => null,
+                'statusCode' => 404
+            ];
         }
 
-        $cambioRelacion = $idMateria !== $idMateriaActual
-            || $idEspCurr !== $idEspCurrActual;
+        $cambioRelacion =
+            $nuevosDatos['idMateria'] !== $idMateriaActual
+            || $nuevosDatos['idEspCurr'] !== $idEspCurrActual;
 
         if ($cambioRelacion) {
-            $existeMateriaEspacioCurricular = db_connect()
-                ->table('Materia_EspacioCurricular')
-                ->where('idMateria', $idMateria)
-                ->where('idEspCurr', $idEspCurr)
-                ->get()
-                ->getRowArray();
+            $paramsBusqueda = [
+                ...$nuevosDatos,
+                'limit' => 1
+            ];
 
-            if ($existeMateriaEspacioCurricular) {
-                $estaDadaDeBaja = !empty($existeMateriaEspacioCurricular['deletedBy'])
-                    || !empty($existeMateriaEspacioCurricular['deletedAt']);
+            $relacionDestino =
+                $this->model->encontrarMatEspCurr($paramsBusqueda);
+
+            if ($relacionDestino) {
+                $estaDadaDeBaja =
+                    !empty($relacionDestino->deletedBy)
+                    || !empty($relacionDestino->deletedAt);
 
                 if ($estaDadaDeBaja) {
-                    $db = db_connect();
-                    $db->transStart();
-
-                    $db->table('Materia_EspacioCurricular')
-                        ->where('idMateria', $idMateriaActual)
-                        ->where('idEspCurr', $idEspCurrActual)
-                        ->update([
-                            'deletedBy' => 'system',
-                            'deletedAt' => date('Y-m-d H:i:s')
-                        ]);
-
-                    $db->table('Materia_EspacioCurricular')
-                        ->where('idMateria', $idMateria)
-                        ->where('idEspCurr', $idEspCurr)
-                        ->update([
-                            'deletedBy' => null,
-                            'deletedAt' => null,
-                            'updatedBy' => 'system',
-                            'updatedAt' => date('Y-m-d H:i:s')
-                        ]);
-
-                    $db->transComplete();
-
-                    $updated = $db->transStatus();
+                    $reactivated = $this->model->reactivarMatEspCurr(
+                        $nuevosDatos['idMateria'],
+                        $nuevosDatos['idEspCurr']
+                    );
 
                     return [
-                        'success' => $updated,
-                        'message' => $updated ? 'Relación Materia - Espacio curricular actualizada exitosamente.' : 'Error al actualizar la relación Materia - Espacio curricular.',
-                        'data' => $updated ? $this->findWithMateriaEspacioCurricular($idMateria, $idEspCurr) : null
+                        'success' => $reactivated,
+                        'message' => $reactivated
+                            ? 'Relación de Materia y Espacio Curricular actualizada correctamente.'
+                            : 'Error al actualizar la relación Materia - Espacio curricular.',
+                        'data' => $reactivated
+                            ? ($this->model->obtenerMatEspCurr($paramsBusqueda)[0] ?? null)
+                            : null
                     ];
                 }
 
@@ -190,36 +183,38 @@ class LibraryMateriaEspacioCurricular
             }
         }
 
-        $updated = db_connect()
-            ->table('Materia_EspacioCurricular')
-            ->where('idMateria', $idMateriaActual)
-            ->where('idEspCurr', $idEspCurrActual)
-            ->update([
-                'idMateria' => $idMateria,
-                'idEspCurr' => $idEspCurr,
-                'updatedBy' => 'system',
-                'updatedAt' => date('Y-m-d H:i:s')
-            ]);
+        $updated = $this->model->actualizarMatEspCurr(
+            $idMateriaActual,
+            $idEspCurrActual,
+            $nuevosDatos
+        );
+
+        $paramsBusqueda = [
+            ...$nuevosDatos,
+            'limit' => 1
+        ];
+
+        $resultado = $updated
+            ? ($this->model->obtenerMatEspCurr($paramsBusqueda)[0] ?? null)
+            : null;
 
         return [
             'success' => $updated,
-            'message' => $updated ? 'Relación Materia - Espacio curricular actualizada exitosamente.' : 'Error al actualizar la relación Materia - Espacio curricular.',
-            'data' => $updated ? $this->findWithMateriaEspacioCurricular($idMateria, $idEspCurr) : null
+            'message' => $updated
+                ? 'Relación de Materia y Espacio Curricular actualizada correctamente.'
+                : 'Error al actualizar la relación Materia - Espacio curricular.',
+            'data' => $resultado
         ];
     }
 
     public function delete(int $idMateria, int $idEspCurr)
     {
-        $existente = db_connect()
-            ->table('Materia_EspacioCurricular')
-            ->where('idMateria', $idMateria)
-            ->where('idEspCurr', $idEspCurr)
-            ->where('deletedBy', null)
-            ->where('deletedAt', null)
-            ->get()
-            ->getRowArray();
+        $matEspCurrExistente = $this->model->encontrarMatEspCurr([
+            'idMateria' => $idMateria,
+            'idEspCurr' => $idEspCurr,
+        ]);
 
-        if (!$existente) {
+        if (!$matEspCurrExistente) {
             return [
                 'success' => false,
                 'message' => 'Relación Materia - Espacio curricular no encontrada.',
@@ -228,68 +223,12 @@ class LibraryMateriaEspacioCurricular
             ];
         }
 
-        $deleted = db_connect()
-            ->table('Materia_EspacioCurricular')
-            ->where('idMateria', $idMateria)
-            ->where('idEspCurr', $idEspCurr)
-            ->update([
-                'deletedBy' => 'system',
-                'deletedAt' => date('Y-m-d H:i:s')
-            ]);
+        $deleted = $this->model->eliminarMatEspCurr($idMateria, $idEspCurr);
 
         return [
             'success' => $deleted,
             'message' => $deleted ? 'Relación eliminada exitosamente.' : 'Error al eliminar la relación.',
             'data' => null
         ];
-    }
-
-    private function findWithMateriaEspacioCurricular(int $idMateria, int $idEspCurr)
-    {
-        return db_connect()
-            ->table('Materia_EspacioCurricular')
-            ->select('Materia_EspacioCurricular.*, Materia.nombre AS nombreMateria, Espacio_Curricular.nombre AS nombreEspacioCurricular')
-            ->join('Materia', 'Materia.id = Materia_EspacioCurricular.idMateria')
-            ->join('Espacio_Curricular', 'Espacio_Curricular.id = Materia_EspacioCurricular.idEspCurr')
-            ->where('Materia_EspacioCurricular.idMateria', $idMateria)
-            ->where('Materia_EspacioCurricular.idEspCurr', $idEspCurr)
-            ->where('Materia_EspacioCurricular.deletedBy', null)
-            ->where('Materia_EspacioCurricular.deletedAt', null)
-            ->get()
-            ->getRowArray();
-    }
-
-    private function validarMateria(int $idMateria): ?array
-    {
-        $materiaModel = new Materia_model();
-        $materia = $materiaModel->find($idMateria);
-
-        if (!$materia) {
-            return [
-                'success' => false,
-                'message' => 'La materia seleccionada no existe.',
-                'data' => null,
-                'statusCode' => 400
-            ];
-        }
-
-        return null;
-    }
-
-    private function validarEspacioCurricular(int $idEspacioCurricular): ?array
-    {
-        $espCurrModel = new EspacioCurricular_model();
-        $espCurr = $espCurrModel->find($idEspacioCurricular);
-
-        if (!$espCurr) {
-            return [
-                'success' => false,
-                'message' => 'El Espacio Curricular seleccionado no existe.',
-                'data' => null,
-                'statusCode' => 400
-            ];
-        }
-
-        return null;
     }
 }

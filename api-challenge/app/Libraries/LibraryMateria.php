@@ -2,31 +2,32 @@
 
 namespace App\Libraries;
 
-use App\Entities\MateriaEntity;
 use App\Models\Materia_model;
 
 class LibraryMateria
 {
+    private Materia_model $model;
+
+    public function __construct()
+    {
+        $this->model = new Materia_model();
+    }
+
     public function getAll()
     {
-        $model = new Materia_model();
-        $data['materias'] = $model->findAll();
+        $data['materias'] = $this->model->findAll();
         return $data;
     }
 
     public function create(array $data)
     {
-        $materia = new MateriaEntity();
-        $materia->nombre = $data['nombre'] ?? null;
-        $materia->anio = (int) ($data['anio'] ?? 0);
+        $params = [
+            'nombre' => $data['nombre'] ?? null,
+            'anio' => (int) ($data['anio'] ?? 0),
+            'limit' => 1
+        ];
 
-        $model = new Materia_model();
-
-        $existeMateria = $model
-            ->where('nombre', $data['nombre'])
-            ->where('anio', $data['anio'])
-            ->first();
-
+        $existeMateria = $this->model->encontrarMateria($params);
         if ($existeMateria) {
             return [
                 'success' => false,
@@ -36,10 +37,10 @@ class LibraryMateria
             ];
         }
 
-        $idMateria = $model->insert($materia, true);
+        $idMateria = $this->model->nuevaMateria($params);
 
         $dataMateria = $idMateria
-            ? $model->find($idMateria)
+            ? $this->model->find($idMateria)
             : null;
 
         return [
@@ -51,9 +52,7 @@ class LibraryMateria
 
     public function update(int $id, array $data)
     {
-        $model = new Materia_model();
-        $materiaExistente = $model->find($id);
-
+        $materiaExistente = $this->model->find($id);
         if (!$materiaExistente) {
             return [
                 'success' => false,
@@ -63,38 +62,34 @@ class LibraryMateria
             ];
         }
 
-        $existeMateria = $model
-            ->where('nombre', $data['nombre'])
-            ->where('anio', $data['anio'])
-            ->where('id !=', $id)
-            ->first();
+        $params = [
+            'nombre' => $data['nombre'] ?? null,
+            'anio' => (int) ($data['anio'] ?? 0),
+            'limit' => 1
+        ];
 
+        $existeMateria = $this->model->encontrarMateria($params);
         if ($existeMateria) {
             return [
                 'success' => false,
-                'message' => 'Ya existe otra materia con ese nombre y año.',
+                'message' => 'Ya existe una materia con ese nombre y año.',
                 'data' => null,
                 'statusCode' => 409
             ];
         }
 
-        $updated = $model->update($id, [
-            'nombre' => $data['nombre'],
-            'anio' => $data['anio']
-        ]);
+        $updated = $this->model->actualizarMateria($id, $params);
 
         return [
             'success' => $updated,
             'message' => $updated ? 'Materia actualizada exitosamente.' : 'Error al actualizar la materia.',
-            'data' => $updated ? $model->find($id) : null
+            'data' => $updated ? $this->model->find($id) : null
         ];
     }
 
     public function delete(int $id)
     {
-        $model = new Materia_model();
-        $materiaExistente = $model->find($id);
-
+        $materiaExistente = $this->model->find($id);
         if (!$materiaExistente) {
             return [
                 'success' => false,
@@ -104,7 +99,7 @@ class LibraryMateria
             ];
         }
 
-        $deleted = $model->delete($id);
+        $deleted = $this->model->delete($id);
 
         return [
             'success' => $deleted,
