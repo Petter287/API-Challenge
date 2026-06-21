@@ -54,3 +54,12 @@ $routes->group('materia-espacio-curricular', function($routes) {
     $routes->get('list', 'MateriaEspacioCurricular::list');
     $routes->get('options', 'MateriaEspacioCurricular::options');
 });
+
+$routes->group('estudiante-espacio-curricular', function($routes) {
+    $routes->get('/', 'EstudianteEspacioCurricular::index');
+    $routes->post('create', 'EstudianteEspacioCurricular::create');
+    $routes->put('update/(:num)/(:num)', 'EstudianteEspacioCurricular::update/$1/$2');
+    $routes->delete('delete/(:num)/(:num)', 'EstudianteEspacioCurricular::delete/$1/$2');
+    $routes->get('list', 'EstudianteEspacioCurricular::list');
+    $routes->get('options', 'EstudianteEspacioCurricular::options');
+});

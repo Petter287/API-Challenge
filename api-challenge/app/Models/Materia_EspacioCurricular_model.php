@@ -108,15 +108,14 @@ class Materia_EspacioCurricular_model extends Base_model
             ];
         }
 
-        $deleted = $this->db->table($this->table)
-                            ->where('idMateria', $idMateria)
-                            ->where('idEspCurr', $idEspCurr)
-                            ->delete();
-
-        return [
-            'success' => $deleted,
-            'message' => $deleted ? 'Relación eliminada exitosamente.' : 'Error al eliminar la relación.',
-            'data' => null
-        ];
+        return $this->db->table($this->table)
+            ->where('idMateria', $idMateria)
+            ->where('idEspCurr', $idEspCurr)
+            ->where('deletedBy', null)
+            ->where('deletedAt', null)
+            ->update([
+                'deletedBy' => 'system',
+                'deletedAt' => date('Y-m-d H:i:s')
+            ]);
     }
 }
