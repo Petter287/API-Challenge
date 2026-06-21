@@ -175,7 +175,9 @@ class LibraryEstudianteEspacioCurricular
                 $estaDadaDeBaja = !empty($relacionDestino->deletedBy) || !empty($relacionDestino->deletedAt);
 
                 if ($estaDadaDeBaja) {
-                    $reactivated = $this->model->reactivarEstEspCurr($idEstudianteActual, $idEspCurrActual, (int) $data['idEstadoEspCurr']);
+                    $this->model->eliminarEstEspCurr($idEstudianteActual, $idEspCurrActual);
+
+                    $reactivated = $this->model->reactivarEstEspCurr($nuevosDatos['idEstudiante'], $nuevosDatos['idEspCurr'], (int) $data['idEstadoEspCurr']);
 
                     return [
                         'success' => $reactivated,

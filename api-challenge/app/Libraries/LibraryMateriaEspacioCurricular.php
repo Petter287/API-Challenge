@@ -158,10 +158,9 @@ class LibraryMateriaEspacioCurricular
                     || !empty($relacionDestino->deletedAt);
 
                 if ($estaDadaDeBaja) {
-                    $reactivated = $this->model->reactivarMatEspCurr(
-                        $nuevosDatos['idMateria'],
-                        $nuevosDatos['idEspCurr']
-                    );
+                    $this->model->eliminarMatEspCurr($idMateriaActual, $idEspCurrActual);
+
+                    $reactivated = $this->model->reactivarMatEspCurr($nuevosDatos['idMateria'], $nuevosDatos['idEspCurr']);
 
                     return [
                         'success' => $reactivated,

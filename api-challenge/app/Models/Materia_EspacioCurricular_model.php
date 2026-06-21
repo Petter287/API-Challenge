@@ -52,8 +52,8 @@ class Materia_EspacioCurricular_model extends Base_model
     public function nuevoMatEspCurr(array $data)
     {
         $matEspCurr = new MateriaEspacioCurricularEntity();
-        $matEspCurr->idMateria = $data['idMateria'] ?? null;
-        $matEspCurr->idEspCurr = $data['idEspCurr'] ?? null;
+        $matEspCurr->idMateria = (int) ($data['idMateria'] ?? 0);
+        $matEspCurr->idEspCurr = (int) ($data['idEspCurr'] ?? 0);
 
         return $this->insert($matEspCurr);
     }
@@ -80,16 +80,13 @@ class Materia_EspacioCurricular_model extends Base_model
 
     public function actualizarMatEspCurr(int $idMateriaActual, int $idEspCurrActual, array $data)
     {
-        $updated = $this->db->table($this->table)
-                            ->where('idMateria', $idMateriaActual)
-                            ->where('idEspCurr', $idEspCurrActual)
-                            ->update($data);
+        $data['updatedBy'] = $data['updatedBy'] ?? 'system';
+        $data['updatedAt'] = $data['updatedAt'] ?? date('Y-m-d H:i:s');
 
-        return [
-            'success' => $updated,
-            'message' => $updated ? 'Relación actualizada exitosamente.' : 'Error al actualizar la relación.',
-            'data' => null
-        ];
+        return $this->db->table($this->table)
+            ->where('idMateria', $idMateriaActual)
+            ->where('idEspCurr', $idEspCurrActual)
+            ->update($data);
     }
 
     public function eliminarMatEspCurr(int $idMateria, int $idEspCurr)
@@ -100,12 +97,7 @@ class Materia_EspacioCurricular_model extends Base_model
         ]);
 
         if (!$matEspCurrExistente) {
-            return [
-                'success' => false,
-                'message' => 'Relación Materia - Espacio curricular no encontrada.',
-                'data' => null,
-                'statusCode' => 404
-            ];
+            return false;
         }
 
         return $this->db->table($this->table)

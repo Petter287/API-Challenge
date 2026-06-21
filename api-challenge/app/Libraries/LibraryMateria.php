@@ -99,7 +99,7 @@ class LibraryMateria
             ];
         }
 
-        $deleted = $this->model->delete($id);
+        $deleted = $this->model->deleteWithUser($id);
 
         return [
             'success' => $deleted,

@@ -53,4 +53,18 @@ abstract class Base_model extends Model
 
         return $data;
     }
+
+    public function deleteWithUser(int $id, string $user = 'system'): bool
+    {
+        return $this->db->table($this->table)
+            ->where($this->primaryKey, $id)
+            ->where('deletedBy', null)
+            ->where('deletedAt', null)
+            ->update([
+                'deletedBy' => $user,
+                'deletedAt' => date('Y-m-d H:i:s'),
+                'updatedBy' => $user,
+                'updatedAt' => date('Y-m-d H:i:s'),
+            ]);
+    }
 }

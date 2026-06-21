@@ -85,7 +85,7 @@ class Estudiante_EspacioCurricular_model extends Base_model
         $estEspCurrExistente->updatedBy = 'system';
         $estEspCurrExistente->updatedAt = date('Y-m-d H:i:s');
 
-        return $this->actualizarMatEspCurr($idEstudiante, $idEspCurr, (array) $estEspCurrExistente);
+        return $this->actualizarEstEspCurr($idEstudiante, $idEspCurr, (array) $estEspCurrExistente);
     }
     public function actualizarEstEspCurr(int $idEstudianteActual, int $idEspCurrActual, array $data): bool
     {
