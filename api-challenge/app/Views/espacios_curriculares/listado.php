@@ -19,7 +19,9 @@ $periodos = $periodos ?? [];
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
-<body class="bg-light">
+<body class="bg-light with-app-shell">
+
+    <?= view('layout/sidebar') ?>
 
     <div class="container py-5">
 
