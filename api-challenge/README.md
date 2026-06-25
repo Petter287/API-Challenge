@@ -1,69 +1,109 @@
-# CodeIgniter 4 Application Starter
+# Gestión Académica - API Challenge
 
-## What is CodeIgniter?
+Aplicación web desarrollada con CodeIgniter 4 para administrar estudiantes,
+materias, periodos y espacios curriculares.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Funcionalidades
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+- CRUD de estudiantes.
+- CRUD de materias.
+- CRUD de periodos.
+- CRUD de estados de espacios curriculares.
+- CRUD de espacios curriculares.
+- Asociación entre materias y espacios curriculares.
+- Asociación entre estudiantes y espacios curriculares.
+- Bajas lógicas mediante `deletedBy` y `deletedAt`.
+- Reactivación de relaciones dadas de baja.
+- Interfaz web con navegación lateral y respuestas JSON para las operaciones.
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## Requisitos
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+- PHP 8.2 o superior.
+- Composer.
+- MySQL o MariaDB.
+- Extensiones de PHP `intl`, `mbstring`, `mysqli` y `json`.
 
-## Installation & updates
+Para ejecutar los tests de ejemplo también se necesita la extensión `sqlite3`.
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+## Instalación
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+1. Clonar o descargar el proyecto.
+2. Abrir una terminal en la carpeta `api-challenge`.
+3. Instalar las dependencias:
 
-## Setup
+```bash
+composer install
+```
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+4. Crear una base de datos MySQL llamada `api-challenge`.
+5. Ejecutar en phpMyAdmin el script ubicado en `../db_api-challenge`.
 
-## Important Change with index.php
+## Configuración
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+Copiar el archivo `env` como `.env` y configurar la conexión:
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+```ini
+CI_ENVIRONMENT = development
 
-**Please** read the user guide for a better explanation of how CI4 works!
+app.baseURL = 'http://localhost:8080/'
 
-## Repository Management
+database.default.hostname = 127.0.0.1
+database.default.database = api-challenge
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+database.default.port = 3306
+```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Los valores deben ajustarse según la instalación local de MySQL.
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+## Ejecución
 
-## Server Requirements
+Desde la carpeta `api-challenge`, iniciar el servidor:
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+```bash
+php spark serve
+```
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+La aplicación estará disponible en:
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+```text
+http://localhost:8080
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+La ruta principal abre el panel de inicio, desde donde se puede acceder a todos
+los módulos.
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+## Módulos y rutas
+
+| Módulo | Ruta |
+| --- | --- |
+| Inicio | `/` |
+| Estudiantes | `/estudiante` |
+| Periodos | `/periodo` |
+| Materias | `/materia` |
+| Estados | `/estado-espacio-curricular` |
+| Espacios curriculares | `/espacio-curricular` |
+| Materias por espacio | `/materia-espacio-curricular` |
+| Estudiantes por espacio | `/estudiante-espacio-curricular` |
+
+## Pruebas
+
+Para ejecutar PHPUnit:
+
+```bash
+composer test
+```
+
+Los tests incluidos por CodeIgniter utilizan SQLite en memoria, por lo que la
+extensión `sqlite3` debe estar habilitada en PHP.
+
+## Estructura principal
+
+- `app/Controllers`: recepción de solicitudes y respuestas HTTP.
+- `app/Libraries`: reglas de negocio y construcción de respuestas.
+- `app/Models`: acceso y persistencia de datos.
+- `app/Entities`: representación de las entidades.
+- `app/Views`: interfaz web.
+- `app/Config/Routes.php`: definición de rutas.
+- `../db_api-challenge`: script SQL de creación de la base de datos.

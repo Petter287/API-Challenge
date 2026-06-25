@@ -92,7 +92,7 @@ class LibraryEspacioCurricular
         ];
 
         $existeEspacioCurricular = $this->model->encontrarEspacioCurricular($params);
-        if ($existeEspacioCurricular) {
+        if ($existeEspacioCurricular && (int) $existeEspacioCurricular->id !== $id) {
             return [
                 'success' => false,
                 'message' => 'Ya existe un espacio curricular con ese nombre y período.',

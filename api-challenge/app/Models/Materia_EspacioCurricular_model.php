@@ -60,7 +60,7 @@ class Materia_EspacioCurricular_model extends Base_model
 
     public function reactivarMatEspCurr(int $idMateria, int $idEspCurr)
     {
-        $matEspCurrExistente = (object) $this->encontrarMatEspCurr([
+        $matEspCurrExistente = $this->encontrarMatEspCurr([
             'idMateria' => $idMateria,
             'idEspCurr' => $idEspCurr,
             'limit' => 1

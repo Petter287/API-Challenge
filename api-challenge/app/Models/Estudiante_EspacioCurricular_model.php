@@ -69,7 +69,7 @@ class Estudiante_EspacioCurricular_model extends Base_model
 
     public function reactivarEstEspCurr(int $idEstudiante, int $idEspCurr, int $idEstadoEspCurr)
     {
-        $estEspCurrExistente = (object) $this->encontrarEstEspCurr([
+        $estEspCurrExistente = $this->encontrarEstEspCurr([
             'idEstudiante' => $idEstudiante,
             'idEspCurr' => $idEspCurr,
             'limit' => 1

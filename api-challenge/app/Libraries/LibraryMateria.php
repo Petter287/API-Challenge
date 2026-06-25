@@ -69,7 +69,7 @@ class LibraryMateria
         ];
 
         $existeMateria = $this->model->encontrarMateria($params);
-        if ($existeMateria) {
+        if ($existeMateria && (int) $existeMateria->id !== $id) {
             return [
                 'success' => false,
                 'message' => 'Ya existe una materia con ese nombre y año.',

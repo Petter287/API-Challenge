@@ -123,4 +123,6 @@ VALUES  ('anual'),
 ALTER TABLE Estudiante
 ADD COLUMN dni VARCHAR(20) NOT NULL AFTER apellido,
 ADD COLUMN fechaNacimiento DATE NOT NULL AFTER dni;
+
+ALTER TABLE Estudiante
 ADD UNIQUE KEY uq_estudiante_dni (dni);

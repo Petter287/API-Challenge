@@ -15,7 +15,6 @@ abstract class Base_model extends Model
 
     protected $beforeInsert = ['setCreatedBy'];
     protected $beforeUpdate = ['setUpdatedBy'];
-    protected $beforeDelete = ['setDeletedBy'];
 
     public function __construct()
     {
@@ -43,13 +42,6 @@ abstract class Base_model extends Model
     protected function setUpdatedBy(array $data): array
     {
         $data['data']['updatedBy'] = $data['data']['updatedBy'] ?? 'system';
-
-        return $data;
-    }
-
-    protected function setDeletedBy(array $data): array
-    {
-        $data['data']['deletedBy'] = $data['data']['deletedBy'] ?? 'system';
 
         return $data;
     }

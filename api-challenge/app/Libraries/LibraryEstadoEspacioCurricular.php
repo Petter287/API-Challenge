@@ -67,7 +67,7 @@ class LibraryEstadoEspacioCurricular
         ];
 
         $existeEstado = $this->model->encontrarEstado($params);
-        if ($existeEstado) {
+        if ($existeEstado && (int) $existeEstado->id !== $id) {
             return [
                 'success' => false,
                 'message' => 'Ya existe otro estado con ese nombre.',

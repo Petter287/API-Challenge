@@ -67,7 +67,7 @@ class LibraryPeriodo
         ];
 
         $existePeriodo = $this->model->encontrarPeriodo($params);
-        if ($existePeriodo) {
+        if ($existePeriodo && (int) $existePeriodo->id !== $id) {
             return [
                 'success' => false,
                 'message' => 'Ya existe otro periodo con ese nombre.',
