@@ -79,13 +79,14 @@ los módulos.
 | Módulo | Ruta |
 | --- | --- |
 | Inicio | `/` |
-| Estudiantes | `/estudiante` |
-| Periodos | `/periodo` |
-| Materias | `/materia` |
-| Estados | `/estado-espacio-curricular` |
-| Espacios curriculares | `/espacio-curricular` |
-| Materias por espacio | `/materia-espacio-curricular` |
-| Estudiantes por espacio | `/estudiante-espacio-curricular` |
+| Estudiantes | `/students` |
+| Periodos | `/periods` |
+| Materias | `/subjects` |
+| Estados de espacios curriculares | `/curricular-space-statuses` |
+| Espacios curriculares | `/curricular-spaces` |
+| Materias por espacio | `/subject-curricular-spaces` |
+| Estudiantes por espacio | `/student-curricular-spaces` |
+| Estados finales por estudiante | `/students/subjects-status` |
 
 ## Endpoints del challenge
 
@@ -165,14 +166,15 @@ Los valores permitidos son `sin_calificar`, `no_iniciado`, `aprobado` y
 
 ## Colección de Postman
 
-El directorio `postman` contiene una colección y un environment importables:
+El directorio `api-challenge/postman` contiene una colección y un environment
+importables:
 
-- `postman/API-Challenge.postman_collection.json`
-- `postman/Local.postman_environment.json`
+- `api-challenge/postman/API-Challenge.postman_collection.json`
+- `api-challenge/postman/Local.postman_environment.json`
 
 La colección ejecuta el flujo completo y comprueba automáticamente los cuatro
 casos mínimos solicitados por el challenge. Las instrucciones están disponibles
-en `postman/README.md`.
+en `api-challenge/postman/README.md`.
 
 ## Consulta de estados finales
 
@@ -216,6 +218,7 @@ Reglas aplicadas:
 Para ejecutar PHPUnit:
 
 ```bash
+cd api-challenge
 composer test
 ```
 
@@ -224,10 +227,10 @@ extensión `sqlite3` debe estar habilitada en PHP.
 
 ## Estructura principal
 
-- `app/Controllers`: recepción de solicitudes y respuestas HTTP.
-- `app/Libraries`: reglas de negocio y construcción de respuestas.
-- `app/Models`: acceso y persistencia de datos.
-- `app/Entities`: representación de las entidades.
-- `app/Views`: interfaz web.
-- `app/Config/Routes.php`: definición de rutas.
-- `../db_api-challenge`: script SQL de creación de la base de datos.
+- `api-challenge/app/Controllers`: recepción de solicitudes y respuestas HTTP.
+- `api-challenge/app/Libraries`: reglas de negocio y construcción de respuestas.
+- `api-challenge/app/Models`: acceso y persistencia de datos.
+- `api-challenge/app/Entities`: representación de las entidades.
+- `api-challenge/app/Views`: interfaz web.
+- `api-challenge/app/Config/Routes.php`: definición de rutas.
+- `db_api-challenge`: script SQL de creación de la base de datos.
