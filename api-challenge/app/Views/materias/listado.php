@@ -241,7 +241,7 @@
             btnActualizarGrilla.disabled = true;
 
             try {
-                const response = await fetch('/materia/list', {
+                const response = await fetch('/subjects/list', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -311,8 +311,8 @@
             try {
                 const esEdicion = modoForm === 'editar';
                 const url = esEdicion
-                    ? `/materia/update/${idMateria}`
-                    : '/materia/create';
+                    ? `/subjects/${idMateria}`
+                    : '/subjects';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -373,7 +373,7 @@
             btnConfirmarEliminarMateria.innerText = 'Eliminando...';
 
             try {
-                const response = await fetch(`/materia/delete/${idMateria}`, {
+                const response = await fetch(`/subjects/${idMateria}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

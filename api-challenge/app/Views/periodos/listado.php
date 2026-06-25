@@ -231,7 +231,7 @@
             btnActualizarGrilla.disabled = true;
 
             try {
-                const response = await fetch('/periodo/list', {
+                const response = await fetch('/periods/list', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -298,8 +298,8 @@
             try {
                 const esEdicion = modoForm === 'editar';
                 const url = modoForm === 'editar' ?
-                    `/periodo/update/${idPeriodo}` :
-                    '/periodo/create';
+                    `/periods/${idPeriodo}` :
+                    '/periods';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -359,7 +359,7 @@
             btnConfirmarEliminarPeriodo.innerText = 'Eliminando...';
 
             try {
-                const response = await fetch(`/periodo/delete/${idPeriodo}`, {
+                const response = await fetch(`/periods/${idPeriodo}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

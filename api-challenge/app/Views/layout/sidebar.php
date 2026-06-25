@@ -10,45 +10,52 @@ $navItems = [
     ],
     [
         'label' => 'Estudiantes',
-        'href' => '/estudiante',
+        'href' => '/students',
         'icon' => 'bi-people',
-        'match' => 'estudiante',
+        'match' => 'students',
+        'exclude' => ['students/subjects-status'],
     ],
     [
         'label' => 'Periodos',
-        'href' => '/periodo',
+        'href' => '/periods',
         'icon' => 'bi-calendar3',
-        'match' => 'periodo',
+        'match' => 'periods',
     ],
     [
         'label' => 'Estados',
-        'href' => '/estado-espacio-curricular',
+        'href' => '/curricular-space-statuses',
         'icon' => 'bi-check2-circle',
-        'match' => 'estado-espacio-curricular',
+        'match' => 'curricular-space-statuses',
     ],
     [
         'label' => 'Materias',
-        'href' => '/materia',
+        'href' => '/subjects',
         'icon' => 'bi-journal-bookmark',
-        'match' => 'materia',
+        'match' => 'subjects',
     ],
     [
         'label' => 'Espacios curriculares',
-        'href' => '/espacio-curricular',
+        'href' => '/curricular-spaces',
         'icon' => 'bi-diagram-3',
-        'match' => 'espacio-curricular',
+        'match' => 'curricular-spaces',
     ],
     [
         'label' => 'Materias por espacio',
-        'href' => '/materia-espacio-curricular',
+        'href' => '/subject-curricular-spaces',
         'icon' => 'bi-link-45deg',
-        'match' => 'materia-espacio-curricular',
+        'match' => 'subject-curricular-spaces',
     ],
     [
         'label' => 'Estudiantes por espacio',
-        'href' => '/estudiante-espacio-curricular',
+        'href' => '/student-curricular-spaces',
         'icon' => 'bi-mortarboard',
-        'match' => 'estudiante-espacio-curricular',
+        'match' => 'student-curricular-spaces',
+    ],
+    [
+        'label' => 'Estados finales',
+        'href' => '/students/subjects-status',
+        'icon' => 'bi-clipboard-data',
+        'match' => 'students/subjects-status',
     ],
 ];
 ?>
@@ -185,7 +192,11 @@ $navItems = [
 
     <nav class="app-nav" aria-label="Navegación principal">
         <?php foreach ($navItems as $item): ?>
-            <?php $active = $currentPath === $item['match'] || str_starts_with($currentPath, $item['match'] . '/'); ?>
+            <?php
+            $excluded = in_array($currentPath, $item['exclude'] ?? [], true);
+            $active = !$excluded
+                && ($currentPath === $item['match'] || str_starts_with($currentPath, $item['match'] . '/'));
+            ?>
             <a class="app-nav-link<?= $active ? ' active' : '' ?>" href="<?= esc($item['href']) ?>">
                 <i class="bi <?= esc($item['icon']) ?>"></i>
                 <span><?= esc($item['label']) ?></span>

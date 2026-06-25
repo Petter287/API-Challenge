@@ -30,7 +30,7 @@
 
         <div class="row g-3">
             <div class="col-12 col-md-6 col-xl-4">
-                <a href="/estudiante" class="card h-100 text-decoration-none text-body shadow-sm">
+                <a href="/students" class="card h-100 text-decoration-none text-body shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center gap-3">
                             <span class="btn btn-primary disabled">
@@ -46,7 +46,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-4">
-                <a href="/materia" class="card h-100 text-decoration-none text-body shadow-sm">
+                <a href="/subjects" class="card h-100 text-decoration-none text-body shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center gap-3">
                             <span class="btn btn-primary disabled">
@@ -62,7 +62,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-4">
-                <a href="/espacio-curricular" class="card h-100 text-decoration-none text-body shadow-sm">
+                <a href="/curricular-spaces" class="card h-100 text-decoration-none text-body shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center gap-3">
                             <span class="btn btn-primary disabled">
@@ -78,7 +78,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-4">
-                <a href="/estudiante-espacio-curricular" class="card h-100 text-decoration-none text-body shadow-sm">
+                <a href="/student-curricular-spaces" class="card h-100 text-decoration-none text-body shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center gap-3">
                             <span class="btn btn-primary disabled">
@@ -94,7 +94,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-4">
-                <a href="/materia-espacio-curricular" class="card h-100 text-decoration-none text-body shadow-sm">
+                <a href="/subject-curricular-spaces" class="card h-100 text-decoration-none text-body shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center gap-3">
                             <span class="btn btn-primary disabled">
@@ -110,7 +110,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-4">
-                <a href="/estado-espacio-curricular" class="card h-100 text-decoration-none text-body shadow-sm">
+                <a href="/curricular-space-statuses" class="card h-100 text-decoration-none text-body shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center gap-3">
                             <span class="btn btn-primary disabled">
@@ -119,6 +119,22 @@
                             <div>
                                 <h2 class="h5 mb-1">Estados</h2>
                                 <p class="text-muted mb-0">Estados disponibles para las cursadas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="/students/subjects-status" class="card h-100 text-decoration-none text-body shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="btn btn-primary disabled">
+                                <i class="bi bi-clipboard-data"></i>
+                            </span>
+                            <div>
+                                <h2 class="h5 mb-1">Estados finales</h2>
+                                <p class="text-muted mb-0">Consulta del resultado de materias por estudiante.</p>
                             </div>
                         </div>
                     </div>

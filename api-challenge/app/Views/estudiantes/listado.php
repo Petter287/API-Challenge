@@ -280,7 +280,7 @@
             btnActualizarGrilla.disabled = true;
 
             try {
-                const response = await fetch('/estudiante/list', {
+                const response = await fetch('/students/list', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -356,8 +356,8 @@
             try {
                 const esEdicion = modoForm === 'editar';
                 const url = modoForm === 'editar' ?
-                    `/estudiante/update/${idEstudiante}` :
-                    '/estudiante/create';
+                    `/students/${idEstudiante}` :
+                    '/students';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -420,7 +420,7 @@
             btnConfirmarEliminarEstudiante.innerText = 'Eliminando...';
 
             try {
-                const response = await fetch(`/estudiante/delete/${idEstudiante}`, {
+                const response = await fetch(`/students/${idEstudiante}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

@@ -249,7 +249,7 @@ $espaciosCurriculares = $espaciosCurriculares ?? [];
             try {
                 await actualizarOpcionesSelect();
 
-                const response = await fetch('/materia-espacio-curricular/list', {
+                const response = await fetch('/subject-curricular-spaces/list', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -320,8 +320,8 @@ $espaciosCurriculares = $espaciosCurriculares ?? [];
             try {
                 const esEdicion = modoForm === 'editar';
                 const url = esEdicion
-                    ? `/materia-espacio-curricular/update/${idMateriaActual}/${idEspCurrActual}`
-                    : '/materia-espacio-curricular/create';
+                    ? `/subject-curricular-spaces/update/${idMateriaActual}/${idEspCurrActual}`
+                    : '/subject-curricular-spaces/create';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -383,7 +383,7 @@ $espaciosCurriculares = $espaciosCurriculares ?? [];
             btnConfirmarEliminarRelacion.innerText = 'Eliminando...';
 
             try {
-                const response = await fetch(`/materia-espacio-curricular/delete/${idMateria}/${idEspCurr}`, {
+                const response = await fetch(`/subject-curricular-spaces/delete/${idMateria}/${idEspCurr}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -416,7 +416,7 @@ $espaciosCurriculares = $espaciosCurriculares ?? [];
         });
 
         async function actualizarOpcionesSelect() {
-            const response = await fetch('/materia-espacio-curricular/options', {
+            const response = await fetch('/subject-curricular-spaces/options', {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'

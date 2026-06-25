@@ -5,61 +5,46 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 
+$routes->get('students', 'Estudiante::index');
 $routes->post('students', 'Estudiante::create');
+$routes->get('students/list', 'Estudiante::list');
+$routes->put('students/(:num)', 'Estudiante::update/$1');
+$routes->delete('students/(:num)', 'Estudiante::delete/$1');
+$routes->get('students/subjects-status', 'Estudiante::subjectStatusesPage');
+$routes->get('students/(:num)/subjects-status', 'Estudiante::subjectStatuses/$1');
+
+$routes->get('subjects', 'Materia::index');
 $routes->post('subjects', 'Materia::create');
+$routes->get('subjects/list', 'Materia::list');
+$routes->put('subjects/(:num)', 'Materia::update/$1');
+$routes->delete('subjects/(:num)', 'Materia::delete/$1');
+
+$routes->get('periods', 'Periodo::index');
+$routes->post('periods', 'Periodo::create');
+$routes->get('periods/list', 'Periodo::list');
+$routes->put('periods/(:num)', 'Periodo::update/$1');
+$routes->delete('periods/(:num)', 'Periodo::delete/$1');
+
+$routes->get('curricular-space-statuses', 'EstadoEspacioCurricular::index');
+$routes->post('curricular-space-statuses', 'EstadoEspacioCurricular::create');
+$routes->get('curricular-space-statuses/list', 'EstadoEspacioCurricular::list');
+$routes->put('curricular-space-statuses/(:num)', 'EstadoEspacioCurricular::update/$1');
+$routes->delete('curricular-space-statuses/(:num)', 'EstadoEspacioCurricular::delete/$1');
+
+$routes->get('curricular-spaces', 'EspacioCurricular::index');
 $routes->post('curricular-spaces', 'EspacioCurricular::createFromChallenge');
+$routes->post('curricular-spaces/create', 'EspacioCurricular::create');
+$routes->get('curricular-spaces/list', 'EspacioCurricular::list');
+$routes->get('curricular-spaces/periods', 'EspacioCurricular::periodos');
+$routes->put('curricular-spaces/(:num)', 'EspacioCurricular::update/$1');
+$routes->delete('curricular-spaces/(:num)', 'EspacioCurricular::delete/$1');
+
 $routes->post(
     'subjects/(:num)/curricular-spaces/(:num)',
     'MateriaEspacioCurricular::createFromChallenge/$1/$2'
 );
-$routes->post(
-    'students/(:num)/curricular-spaces/(:num)/status',
-    'EstudianteEspacioCurricular::setStatus/$1/$2'
-);
-$routes->get('students/(:num)/subjects-status', 'Estudiante::subjectStatuses/$1');
 
-$routes->group('estudiante', function($routes) {
-    $routes->get('/', 'Estudiante::index');
-    $routes->post('create', 'Estudiante::create');
-    $routes->put('update/(:num)', 'Estudiante::update/$1');
-    $routes->delete('delete/(:num)', 'Estudiante::delete/$1');
-    $routes->get('list', 'Estudiante::list');
-});
-
-$routes->group('periodo', function($routes){
-    $routes->get('/', 'Periodo::index');
-    $routes->post('create', 'Periodo::create');
-    $routes->put('update/(:num)', 'Periodo::update/$1');
-    $routes->delete('delete/(:num)', 'Periodo::delete/$1');
-    $routes->get('list', 'Periodo::list');
-});
-
-$routes->group('estado-espacio-curricular', function($routes) {
-    $routes->get('/', 'EstadoEspacioCurricular::index');
-    $routes->post('create', 'EstadoEspacioCurricular::create');
-    $routes->put('update/(:num)', 'EstadoEspacioCurricular::update/$1');
-    $routes->delete('delete/(:num)', 'EstadoEspacioCurricular::delete/$1');
-    $routes->get('list', 'EstadoEspacioCurricular::list');
-});
-
-$routes->group('materia', function($routes) {
-    $routes->get('/', 'Materia::index');
-    $routes->post('create', 'Materia::create');
-    $routes->put('update/(:num)', 'Materia::update/$1');
-    $routes->delete('delete/(:num)', 'Materia::delete/$1');
-    $routes->get('list', 'Materia::list');
-});
-
-$routes->group('espacio-curricular', function($routes) {
-    $routes->get('/', 'EspacioCurricular::index');
-    $routes->post('create', 'EspacioCurricular::create');
-    $routes->put('update/(:num)', 'EspacioCurricular::update/$1');
-    $routes->delete('delete/(:num)', 'EspacioCurricular::delete/$1');
-    $routes->get('list', 'EspacioCurricular::list');
-    $routes->get('periodos', 'EspacioCurricular::periodos');
-});
-
-$routes->group('materia-espacio-curricular', function($routes) {
+$routes->group('subject-curricular-spaces', function($routes) {
     $routes->get('/', 'MateriaEspacioCurricular::index');
     $routes->post('create', 'MateriaEspacioCurricular::create');
     $routes->put('update/(:num)/(:num)', 'MateriaEspacioCurricular::update/$1/$2');
@@ -68,7 +53,12 @@ $routes->group('materia-espacio-curricular', function($routes) {
     $routes->get('options', 'MateriaEspacioCurricular::options');
 });
 
-$routes->group('estudiante-espacio-curricular', function($routes) {
+$routes->post(
+    'students/(:num)/curricular-spaces/(:num)/status',
+    'EstudianteEspacioCurricular::setStatus/$1/$2'
+);
+
+$routes->group('student-curricular-spaces', function($routes) {
     $routes->get('/', 'EstudianteEspacioCurricular::index');
     $routes->post('create', 'EstudianteEspacioCurricular::create');
     $routes->put('update/(:num)/(:num)', 'EstudianteEspacioCurricular::update/$1/$2');

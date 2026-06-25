@@ -225,7 +225,7 @@
             btnActualizarGrilla.disabled = true;
 
             try {
-                const response = await fetch('/estado-espacio-curricular/list', {
+                const response = await fetch('/curricular-space-statuses/list', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -292,8 +292,8 @@
             try {
                 const esEdicion = modoForm === 'editar';
                 const url = esEdicion
-                    ? `/estado-espacio-curricular/update/${idEstado}`
-                    : '/estado-espacio-curricular/create';
+                    ? `/curricular-space-statuses/${idEstado}`
+                    : '/curricular-space-statuses';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -353,7 +353,7 @@
             btnConfirmarEliminarEstado.innerText = 'Eliminando...';
 
             try {
-                const response = await fetch(`/estado-espacio-curricular/delete/${idEstado}`, {
+                const response = await fetch(`/curricular-space-statuses/${idEstado}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

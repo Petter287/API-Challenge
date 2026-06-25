@@ -247,7 +247,7 @@ $periodos = $periodos ?? [];
             try {
                 await actualizarPeriodosSelect();
 
-                const response = await fetch('/espacio-curricular/list', {
+                const response = await fetch('/curricular-spaces/list', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -317,8 +317,8 @@ $periodos = $periodos ?? [];
             try {
                 const esEdicion = modoForm === 'editar';
                 const url = esEdicion
-                    ? `/espacio-curricular/update/${idEspacioCurricular}`
-                    : '/espacio-curricular/create';
+                    ? `/curricular-spaces/${idEspacioCurricular}`
+                    : '/curricular-spaces/create';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -379,7 +379,7 @@ $periodos = $periodos ?? [];
             btnConfirmarEliminarEspacioCurricular.innerText = 'Eliminando...';
 
             try {
-                const response = await fetch(`/espacio-curricular/delete/${idEspacioCurricular}`, {
+                const response = await fetch(`/curricular-spaces/${idEspacioCurricular}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -412,7 +412,7 @@ $periodos = $periodos ?? [];
         });
 
         async function actualizarPeriodosSelect() {
-            const response = await fetch('/espacio-curricular/periodos', {
+            const response = await fetch('/curricular-spaces/periods', {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'

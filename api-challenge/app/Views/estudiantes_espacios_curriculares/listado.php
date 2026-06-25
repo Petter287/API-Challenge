@@ -265,7 +265,7 @@ $estadosEspaciosCurriculares = $estadosEspaciosCurriculares ?? [];
             try {
                 await actualizarOpcionesSelect();
 
-                const response = await fetch('/estudiante-espacio-curricular/list', {
+                const response = await fetch('/student-curricular-spaces/list', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -338,8 +338,8 @@ $estadosEspaciosCurriculares = $estadosEspaciosCurriculares ?? [];
             try {
                 const esEdicion = modoForm === 'editar';
                 const url = esEdicion
-                    ? `/estudiante-espacio-curricular/update/${idEstudianteActual}/${idEspCurrActual}`
-                    : '/estudiante-espacio-curricular/create';
+                    ? `/student-curricular-spaces/update/${idEstudianteActual}/${idEspCurrActual}`
+                    : '/student-curricular-spaces/create';
 
                 const response = await fetch(url, {
                     method: esEdicion ? 'PUT' : 'POST',
@@ -402,7 +402,7 @@ $estadosEspaciosCurriculares = $estadosEspaciosCurriculares ?? [];
             btnConfirmarEliminarRelacion.innerText = 'Eliminando...';
 
             try {
-                const response = await fetch(`/estudiante-espacio-curricular/delete/${idEstudiante}/${idEspCurr}`, {
+                const response = await fetch(`/student-curricular-spaces/delete/${idEstudiante}/${idEspCurr}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -435,7 +435,7 @@ $estadosEspaciosCurriculares = $estadosEspaciosCurriculares ?? [];
         });
 
         async function actualizarOpcionesSelect() {
-            const response = await fetch('/estudiante-espacio-curricular/options', {
+            const response = await fetch('/student-curricular-spaces/options', {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'

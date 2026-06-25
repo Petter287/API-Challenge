@@ -125,6 +125,13 @@ class Estudiante extends BaseController
             ->setJSON($result['data']);
     }
 
+    public function subjectStatusesPage()
+    {
+        $library = new LibraryEstudiante();
+
+        return view('estudiantes/estados_finales', $library->getAll());
+    }
+
     private function isValidDate(string $date): bool
     {
         $dateTime = \DateTime::createFromFormat('Y-m-d', $date);
