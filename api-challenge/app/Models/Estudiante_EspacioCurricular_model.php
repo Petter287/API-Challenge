@@ -57,6 +57,55 @@ class Estudiante_EspacioCurricular_model extends Base_model
         return $query->get()->getRow();
     }
 
+    public function obtenerEstadosMateriaPorEstudiante(int $idEstudiante): array
+    {
+        $materiasDelEstudiante = $this->db
+            ->table('Materia_EspacioCurricular MEC_Estudiante')
+            ->select('MEC_Estudiante.idMateria')
+            ->join(
+                'Estudiante_EspacioCurricular EEC_Estudiante',
+                'EEC_Estudiante.idEspCurr = MEC_Estudiante.idEspCurr'
+            )
+            ->where('EEC_Estudiante.idEstudiante', $idEstudiante)
+            ->where('EEC_Estudiante.deletedBy', null)
+            ->where('EEC_Estudiante.deletedAt', null)
+            ->where('MEC_Estudiante.deletedBy', null)
+            ->where('MEC_Estudiante.deletedAt', null);
+
+        $condicionEstudiante = sprintf(
+            'EEC.idEspCurr = MEC.idEspCurr AND EEC.idEstudiante = %d'
+            . ' AND EEC.deletedBy IS NULL AND EEC.deletedAt IS NULL',
+            $idEstudiante
+        );
+
+        return $this->db->table('Materia_EspacioCurricular MEC')
+            ->select(
+                'M.id AS idMateria, M.nombre AS nombreMateria, M.anio AS anioMateria,'
+                . ' EC.id AS idEspCurr, EC.nombre AS nombreEspCurr,'
+                . ' Estado.estado AS estadoEspCurr'
+            )
+            ->join('Materia M', 'M.id = MEC.idMateria')
+            ->join('Espacio_Curricular EC', 'EC.id = MEC.idEspCurr')
+            ->join('Estudiante_EspacioCurricular EEC', $condicionEstudiante, 'left')
+            ->join(
+                'Estado_EspacioCurricular Estado',
+                'Estado.id = EEC.idEstadoEspCurr'
+                . ' AND Estado.deletedBy IS NULL AND Estado.deletedAt IS NULL',
+                'left'
+            )
+            ->whereIn('MEC.idMateria', $materiasDelEstudiante)
+            ->where('MEC.deletedBy', null)
+            ->where('MEC.deletedAt', null)
+            ->where('M.deletedBy', null)
+            ->where('M.deletedAt', null)
+            ->where('EC.deletedBy', null)
+            ->where('EC.deletedAt', null)
+            ->orderBy('M.id', 'ASC')
+            ->orderBy('EC.id', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
     public function nuevoEstEspCurr(array $data)
     {
         $estEspCurr = new EstudianteEspacioCurricularEntity();

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Libraries\LibraryEspacioCurricular;
 use App\Libraries\LibraryPeriodo;
+use App\Models\Periodo_model;
 
 class EspacioCurricular extends BaseController
 {
@@ -43,6 +44,53 @@ class EspacioCurricular extends BaseController
 
         $library = new LibraryEspacioCurricular();
         $result = $library->create($dataEspacioCurricular);
+
+        return $this->response
+            ->setStatusCode($result['statusCode'] ?? ($result['success'] ? 201 : 500))
+            ->setJSON($result);
+    }
+
+    public function createFromChallenge()
+    {
+        $json = $this->request->getJSON(true);
+        $nombre = trim((string) ($json['nombre'] ?? ''));
+        $periodo = trim((string) ($json['periodo'] ?? ''));
+
+        if ($nombre === '' || $periodo === '') {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'El nombre y el período son obligatorios.',
+                    'data' => null,
+                ]);
+        }
+
+        $periodoModel = new Periodo_model();
+        $periodoExistente = $periodoModel->encontrarPeriodo([
+            'nombre' => $periodo,
+            'limit' => 1,
+        ]);
+
+        if (
+            !$periodoExistente
+            || !empty($periodoExistente->deletedBy)
+            || !empty($periodoExistente->deletedAt)
+        ) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'Período no encontrado.',
+                    'data' => null,
+                ]);
+        }
+
+        $library = new LibraryEspacioCurricular();
+        $result = $library->create([
+            'nombre' => $nombre,
+            'idPeriodo' => (int) $periodoExistente->id,
+        ]);
 
         return $this->response
             ->setStatusCode($result['statusCode'] ?? ($result['success'] ? 201 : 500))

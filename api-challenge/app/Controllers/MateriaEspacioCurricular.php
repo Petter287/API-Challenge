@@ -52,6 +52,19 @@ class MateriaEspacioCurricular extends BaseController
             ->setJSON($result);
     }
 
+    public function createFromChallenge(int $idMateria, int $idEspCurr)
+    {
+        $library = new LibraryMateriaEspacioCurricular();
+        $result = $library->create([
+            'idMateria' => $idMateria,
+            'idEspCurr' => $idEspCurr,
+        ]);
+
+        return $this->response
+            ->setStatusCode($result['statusCode'] ?? ($result['success'] ? 201 : 500))
+            ->setJSON($result);
+    }
+
     public function update(int $idMateriaActual, int $idEspCurrActual)
     {
         $json = $this->request->getJSON(true);

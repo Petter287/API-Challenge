@@ -5,6 +5,19 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 
+$routes->post('students', 'Estudiante::create');
+$routes->post('subjects', 'Materia::create');
+$routes->post('curricular-spaces', 'EspacioCurricular::createFromChallenge');
+$routes->post(
+    'subjects/(:num)/curricular-spaces/(:num)',
+    'MateriaEspacioCurricular::createFromChallenge/$1/$2'
+);
+$routes->post(
+    'students/(:num)/curricular-spaces/(:num)/status',
+    'EstudianteEspacioCurricular::setStatus/$1/$2'
+);
+$routes->get('students/(:num)/subjects-status', 'Estudiante::subjectStatuses/$1');
+
 $routes->group('estudiante', function($routes) {
     $routes->get('/', 'Estudiante::index');
     $routes->post('create', 'Estudiante::create');

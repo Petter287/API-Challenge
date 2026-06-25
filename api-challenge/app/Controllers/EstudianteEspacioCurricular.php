@@ -57,6 +57,29 @@ class EstudianteEspacioCurricular extends BaseController
             ->setJSON($result);
     }
 
+    public function setStatus(int $idEstudiante, int $idEspCurr)
+    {
+        $json = $this->request->getJSON(true);
+        $status = trim((string) ($json['status'] ?? ''));
+
+        if ($status === '') {
+            return $this->response
+                ->setStatusCode(400)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'El estado es obligatorio.',
+                    'data' => null,
+                ]);
+        }
+
+        $library = new LibraryEstudianteEspacioCurricular();
+        $result = $library->setStatus($idEstudiante, $idEspCurr, $status);
+
+        return $this->response
+            ->setStatusCode($result['statusCode'] ?? ($result['success'] ? 200 : 500))
+            ->setJSON($result);
+    }
+
     public function update(int $idEstudianteActual, int $idEspCurrActual)
     {
         $json = $this->request->getJSON(true);

@@ -3,6 +3,7 @@
 namespace App\Libraries;
 
 use App\Models\Estudiante_model;
+use App\Models\Estudiante_EspacioCurricular_model;
 
 class LibraryEstudiante
 {
@@ -17,6 +18,30 @@ class LibraryEstudiante
     {
         $data['estudiantes'] = $this->model->findAll();
         return $data;
+    }
+
+    public function getSubjectStatuses(int $idEstudiante): array
+    {
+        $estudiante = $this->model->find($idEstudiante);
+
+        if (!$estudiante) {
+            return [
+                'success' => false,
+                'message' => 'Estudiante no encontrado.',
+                'data' => null,
+                'statusCode' => 404,
+            ];
+        }
+
+        $relacionModel = new Estudiante_EspacioCurricular_model();
+        $calculator = new EstadoFinalMateriaCalculator();
+        $filas = $relacionModel->obtenerEstadosMateriaPorEstudiante($idEstudiante);
+
+        return [
+            'success' => true,
+            'message' => 'Estados finales obtenidos correctamente.',
+            'data' => $calculator->agruparPorMateria($filas),
+        ];
     }
 
     public function create(array $data)

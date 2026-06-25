@@ -87,6 +87,119 @@ los módulos.
 | Materias por espacio | `/materia-espacio-curricular` |
 | Estudiantes por espacio | `/estudiante-espacio-curricular` |
 
+## Endpoints del challenge
+
+Los endpoints sugeridos en el enunciado están disponibles para probarse desde
+Postman. Todas las solicitudes con body deben enviarse como JSON con el header
+`Content-Type: application/json`.
+
+### Crear estudiante
+
+```http
+POST /students
+```
+
+```json
+{
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "dni": "40123456",
+    "fechaNacimiento": "2000-05-10"
+}
+```
+
+El DNI y la fecha de nacimiento son campos adicionales obligatorios incorporados
+al modelo del proyecto.
+
+### Crear materia tradicional
+
+```http
+POST /subjects
+```
+
+```json
+{
+    "nombre": "Historia",
+    "anio": 1
+}
+```
+
+### Crear espacio curricular
+
+```http
+POST /curricular-spaces
+```
+
+```json
+{
+    "nombre": "Laboratorio de Ciencias Sociales I",
+    "periodo": "anual"
+}
+```
+
+Los períodos iniciales disponibles son `anual`, `primer_cuatrimestre` y
+`segundo_cuatrimestre`.
+
+### Asociar materia y espacio curricular
+
+```http
+POST /subjects/{subjectId}/curricular-spaces/{spaceId}
+```
+
+Esta solicitud no requiere body.
+
+### Registrar o actualizar el estado
+
+```http
+POST /students/{studentId}/curricular-spaces/{spaceId}/status
+```
+
+```json
+{
+    "status": "aprobado"
+}
+```
+
+Los valores permitidos son `sin_calificar`, `no_iniciado`, `aprobado` y
+`en_proceso`.
+
+## Consulta de estados finales
+
+El endpoint solicitado por el challenge calcula el estado de las materias de un
+estudiante y conserva el detalle de los espacios curriculares considerados:
+
+```http
+GET /students/{studentId}/subjects-status
+```
+
+Ejemplo de respuesta:
+
+```json
+[
+    {
+        "materia": "Historia 1° Año",
+        "estado": "en_proceso",
+        "espacios_curriculares": [
+            {
+                "nombre": "Laboratorio de Ciencias Sociales I",
+                "estado": "aprobado"
+            },
+            {
+                "nombre": "Laboratorio de Ciencias Sociales II",
+                "estado": "en_proceso"
+            }
+        ]
+    }
+]
+```
+
+Reglas aplicadas:
+
+- Si todos los espacios están `aprobado`, la materia queda `aprobado`.
+- Si alguno está `en_proceso`, la materia queda `en_proceso`.
+- Si ninguno está en proceso y alguno está `no_iniciado`, queda `no_iniciado`.
+- Los espacios sin estado registrado se consideran `sin_calificar`.
+
 ## Pruebas
 
 Para ejecutar PHPUnit:

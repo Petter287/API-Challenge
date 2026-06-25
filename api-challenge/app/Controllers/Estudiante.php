@@ -109,6 +109,22 @@ class Estudiante extends BaseController
             ]);
     }
 
+    public function subjectStatuses(int $idEstudiante)
+    {
+        $library = new LibraryEstudiante();
+        $result = $library->getSubjectStatuses($idEstudiante);
+
+        if (!$result['success']) {
+            return $this->response
+                ->setStatusCode($result['statusCode'] ?? 500)
+                ->setJSON($result);
+        }
+
+        return $this->response
+            ->setStatusCode(200)
+            ->setJSON($result['data']);
+    }
+
     private function isValidDate(string $date): bool
     {
         $dateTime = \DateTime::createFromFormat('Y-m-d', $date);

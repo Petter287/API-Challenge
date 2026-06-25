@@ -9,6 +9,13 @@ use App\Models\Estudiante_EspacioCurricular_model;
 
 class LibraryEstudianteEspacioCurricular
 {
+    private const ESTADOS_VALIDOS = [
+        'sin_calificar',
+        'no_iniciado',
+        'aprobado',
+        'en_proceso',
+    ];
+
     private Estudiante_EspacioCurricular_model $model;
 
     public function __construct()
@@ -20,6 +27,53 @@ class LibraryEstudianteEspacioCurricular
     {
         $data['estudiantesEspaciosCurriculares'] = $this->model->obtenerEstEspCurr();
         return $data;
+    }
+
+    public function setStatus(int $idEstudiante, int $idEspCurr, string $status): array
+    {
+        if (!in_array($status, self::ESTADOS_VALIDOS, true)) {
+            return [
+                'success' => false,
+                'message' => 'El estado indicado no es válido.',
+                'data' => null,
+                'statusCode' => 400,
+            ];
+        }
+
+        $estadoModel = new Estado_EspacioCurricular_model();
+        $estado = $estadoModel->encontrarEstado([
+            'estado' => $status,
+            'limit' => 1,
+        ]);
+
+        if (!$estado || !empty($estado->deletedBy) || !empty($estado->deletedAt)) {
+            return [
+                'success' => false,
+                'message' => 'El estado indicado no está disponible.',
+                'data' => null,
+                'statusCode' => 404,
+            ];
+        }
+
+        $data = [
+            'idEstudiante' => $idEstudiante,
+            'idEspCurr' => $idEspCurr,
+            'idEstadoEspCurr' => (int) $estado->id,
+        ];
+
+        $relacion = $this->model->encontrarEstEspCurr([
+            'idEstudiante' => $idEstudiante,
+            'idEspCurr' => $idEspCurr,
+            'limit' => 1,
+        ]);
+
+        $relacionActiva = $relacion
+            && empty($relacion->deletedBy)
+            && empty($relacion->deletedAt);
+
+        return $relacionActiva
+            ? $this->update($idEstudiante, $idEspCurr, $data)
+            : $this->create($data);
     }
 
     public function create(array $data)
