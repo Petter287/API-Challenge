@@ -163,6 +163,17 @@ POST /students/{studentId}/curricular-spaces/{spaceId}/status
 Los valores permitidos son `sin_calificar`, `no_iniciado`, `aprobado` y
 `en_proceso`.
 
+## Colección de Postman
+
+El directorio `postman` contiene una colección y un environment importables:
+
+- `postman/API-Challenge.postman_collection.json`
+- `postman/Local.postman_environment.json`
+
+La colección ejecuta el flujo completo y comprueba automáticamente los cuatro
+casos mínimos solicitados por el challenge. Las instrucciones están disponibles
+en `postman/README.md`.
+
 ## Consulta de estados finales
 
 El endpoint solicitado por el challenge calcula el estado de las materias de un

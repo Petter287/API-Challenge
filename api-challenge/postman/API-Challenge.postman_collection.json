@@ -1,0 +1,606 @@
+{
+  "info": {
+    "_postman_id": "29f0cc3b-3e96-4b2c-bc28-fcc4151646aa",
+    "name": "API Challenge - Flujo completo",
+    "description": "Pruebas automatizadas de los cuatro escenarios mínimos del challenge. Ejecutar la colección completa en el orden definido.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.info.requestName === '01 - Crear estudiante' || !pm.collectionVariables.get('runId')) {",
+          "    const timestamp = Date.now();",
+          "    pm.collectionVariables.set('runId', String(timestamp));",
+          "    pm.collectionVariables.set('dni', String(10000000 + (timestamp % 90000000)));",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "runId",
+      "value": ""
+    },
+    {
+      "key": "dni",
+      "value": ""
+    },
+    {
+      "key": "studentId",
+      "value": ""
+    },
+    {
+      "key": "historiaId",
+      "value": ""
+    },
+    {
+      "key": "geografiaId",
+      "value": ""
+    },
+    {
+      "key": "spaceOneId",
+      "value": ""
+    },
+    {
+      "key": "spaceTwoId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Crear estudiante",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Prueba {{runId}}\",\n  \"dni\": \"{{dni}}\",\n  \"fechaNacimiento\": \"2000-05-10\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/students",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "students"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estudiante creado - HTTP 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('La respuesta indica éxito', () => pm.expect(json.success).to.eql(true));",
+              "pm.test('Devuelve el ID del estudiante', () => pm.expect(json.data.id).to.exist);",
+              "pm.collectionVariables.set('studentId', json.data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Crear materia Historia",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Historia {{runId}}\",\n  \"anio\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/subjects",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "subjects"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Historia creada - HTTP 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Devuelve el ID de Historia', () => pm.expect(json.data.id).to.exist);",
+              "pm.collectionVariables.set('historiaId', json.data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Crear materia Geografía",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Geografía {{runId}}\",\n  \"anio\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/subjects",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "subjects"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Geografía creada - HTTP 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Devuelve el ID de Geografía', () => pm.expect(json.data.id).to.exist);",
+              "pm.collectionVariables.set('geografiaId', json.data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Crear espacio curricular I",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Laboratorio de Ciencias Sociales I {{runId}}\",\n  \"periodo\": \"anual\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/curricular-spaces",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "curricular-spaces"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Espacio I creado - HTTP 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Devuelve el ID del espacio I', () => pm.expect(json.data.id).to.exist);",
+              "pm.collectionVariables.set('spaceOneId', json.data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Crear espacio curricular II",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Laboratorio de Ciencias Sociales II {{runId}}\",\n  \"periodo\": \"anual\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/curricular-spaces",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "curricular-spaces"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Espacio II creado - HTTP 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Devuelve el ID del espacio II', () => pm.expect(json.data.id).to.exist);",
+              "pm.collectionVariables.set('spaceTwoId', json.data.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Asociar Historia con espacio I",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/subjects/{{historiaId}}/curricular-spaces/{{spaceOneId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "subjects",
+            "{{historiaId}}",
+            "curricular-spaces",
+            "{{spaceOneId}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Historia asociada al espacio I', () => pm.response.to.have.status(201));",
+              "pm.test('La asociación fue exitosa', () => pm.expect(pm.response.json().success).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Asociar Historia con espacio II",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/subjects/{{historiaId}}/curricular-spaces/{{spaceTwoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "subjects",
+            "{{historiaId}}",
+            "curricular-spaces",
+            "{{spaceTwoId}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Historia asociada al espacio II', () => pm.response.to.have.status(201));",
+              "pm.test('La asociación fue exitosa', () => pm.expect(pm.response.json().success).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Asociar Geografía con espacio I",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/subjects/{{geografiaId}}/curricular-spaces/{{spaceOneId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "subjects",
+            "{{geografiaId}}",
+            "curricular-spaces",
+            "{{spaceOneId}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Geografía asociada al espacio I', () => pm.response.to.have.status(201));",
+              "pm.test('La asociación fue exitosa', () => pm.expect(pm.response.json().success).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Asociar Geografía con espacio II",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/subjects/{{geografiaId}}/curricular-spaces/{{spaceTwoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "subjects",
+            "{{geografiaId}}",
+            "curricular-spaces",
+            "{{spaceTwoId}}"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Geografía asociada al espacio II', () => pm.response.to.have.status(201));",
+              "pm.test('La asociación fue exitosa', () => pm.expect(pm.response.json().success).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Registrar espacio I aprobado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"aprobado\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/students/{{studentId}}/curricular-spaces/{{spaceOneId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "students",
+            "{{studentId}}",
+            "curricular-spaces",
+            "{{spaceOneId}}",
+            "status"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado aprobado registrado', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+              "pm.test('La operación fue exitosa', () => pm.expect(pm.response.json().success).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - Registrar espacio II en proceso",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"en_proceso\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/students/{{studentId}}/curricular-spaces/{{spaceTwoId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "students",
+            "{{studentId}}",
+            "curricular-spaces",
+            "{{spaceTwoId}}",
+            "status"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado en_proceso registrado', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+              "pm.test('La operación fue exitosa', () => pm.expect(pm.response.json().success).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Caso 2 y 4: materias en proceso y espacio compartido",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/students/{{studentId}}/subjects-status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "students",
+            "{{studentId}}",
+            "subjects-status"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Consulta exitosa - HTTP 200', () => pm.response.to.have.status(200));",
+              "const materias = pm.response.json();",
+              "const runId = pm.collectionVariables.get('runId');",
+              "const historia = materias.find(item => item.materia.includes(`Historia ${runId}`));",
+              "const geografia = materias.find(item => item.materia.includes(`Geografía ${runId}`));",
+              "",
+              "pm.test('Historia aparece en el resultado', () => pm.expect(historia).to.exist);",
+              "pm.test('Geografía aparece en el resultado', () => pm.expect(geografia).to.exist);",
+              "pm.test('Historia está en_proceso', () => pm.expect(historia.estado).to.eql('en_proceso'));",
+              "pm.test('Geografía está en_proceso', () => pm.expect(geografia.estado).to.eql('en_proceso'));",
+              "pm.test('Historia conserva la trazabilidad de dos espacios', () => pm.expect(historia.espacios_curriculares).to.have.length(2));",
+              "pm.test('Geografía conserva la trazabilidad de dos espacios', () => pm.expect(geografia.espacios_curriculares).to.have.length(2));",
+              "pm.test('El espacio compartido impacta en ambas materias', () => {",
+              "    const nombre = `Laboratorio de Ciencias Sociales I ${runId}`;",
+              "    pm.expect(historia.espacios_curriculares.some(item => item.nombre === nombre)).to.eql(true);",
+              "    pm.expect(geografia.espacios_curriculares.some(item => item.nombre === nombre)).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - Aprobar el espacio pendiente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"aprobado\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/students/{{studentId}}/curricular-spaces/{{spaceTwoId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "students",
+            "{{studentId}}",
+            "curricular-spaces",
+            "{{spaceTwoId}}",
+            "status"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado pendiente actualizado', () => pm.response.to.have.status(200));",
+              "pm.test('La actualización fue exitosa', () => pm.expect(pm.response.json().success).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 - Casos 1 y 3: materia aprobada y recálculo",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/students/{{studentId}}/subjects-status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "students",
+            "{{studentId}}",
+            "subjects-status"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Consulta recalculada - HTTP 200', () => pm.response.to.have.status(200));",
+              "const materias = pm.response.json();",
+              "const runId = pm.collectionVariables.get('runId');",
+              "const historia = materias.find(item => item.materia.includes(`Historia ${runId}`));",
+              "const geografia = materias.find(item => item.materia.includes(`Geografía ${runId}`));",
+              "",
+              "pm.test('Historia fue recalculada como aprobada', () => pm.expect(historia.estado).to.eql('aprobado'));",
+              "pm.test('Geografía fue recalculada como aprobada', () => pm.expect(geografia.estado).to.eql('aprobado'));",
+              "pm.test('Todos los espacios de Historia están aprobados', () => {",
+              "    pm.expect(historia.espacios_curriculares.every(item => item.estado === 'aprobado')).to.eql(true);",
+              "});",
+              "pm.test('Todos los espacios de Geografía están aprobados', () => {",
+              "    pm.expect(geografia.espacios_curriculares.every(item => item.estado === 'aprobado')).to.eql(true);",
+              "});",
+              "",
+              "pm.collectionVariables.unset('runId');",
+              "pm.collectionVariables.unset('dni');"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
